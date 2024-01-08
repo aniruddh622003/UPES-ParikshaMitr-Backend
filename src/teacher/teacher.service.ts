@@ -5,7 +5,7 @@ import { UpdateTeacherDto } from './dto/update-teacher.dto';
 @Injectable()
 export class TeacherService {
   create(createTeacherDto: CreateTeacherDto) {
-    return 'This action adds a new teacher';
+    return createTeacherDto;
   }
 
   findAll() {
