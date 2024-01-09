@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL),
+
     TeacherModule,
   ],
   controllers: [AppController],

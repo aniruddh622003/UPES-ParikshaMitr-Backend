@@ -10,7 +10,7 @@ import {
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
-import { Teacher } from '../schemas/teacher.schema';
+import { TeacherLoginDto } from './dto/teacher-login';
 
 @Controller('teacher')
 export class TeacherController {
@@ -19,6 +19,11 @@ export class TeacherController {
   @Post()
   create(@Body() createTeacherDto: CreateTeacherDto) {
     return this.teacherService.create(createTeacherDto);
+  }
+
+  @Post('login')
+  login(@Body() teacherLoginDto: TeacherLoginDto) {
+    return this.teacherService.login(teacherLoginDto);
   }
 
   @Get()
