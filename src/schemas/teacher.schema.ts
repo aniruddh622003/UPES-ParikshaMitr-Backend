@@ -16,7 +16,7 @@ export class Teacher {
   @Prop()
   password: string;
 
-  @Prop()
+  @Prop({ default: false })
   approved: boolean;
 }
 

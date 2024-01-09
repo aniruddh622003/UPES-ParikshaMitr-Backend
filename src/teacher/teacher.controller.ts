@@ -10,6 +10,7 @@ import {
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { Teacher } from '../schemas/teacher.schema';
 
 @Controller('teacher')
 export class TeacherController {
