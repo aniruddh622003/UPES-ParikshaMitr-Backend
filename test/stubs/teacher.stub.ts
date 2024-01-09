@@ -16,3 +16,18 @@ export const createTeacherResp = () => {
     },
   };
 };
+
+export const loginTeacherReq = () => {
+  return {
+    sap_id: 500086707,
+    password: 'aniruddh13',
+  };
+};
+
+export const loginTeacherResp = () => {
+  return {
+    message: 'Login successful',
+    token:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OWQzOWFhNDA0MzEyMjcwMWEwOGMyOCIsInNhcF9pZCI6NTAwMDg2NzA3LCJuYW1lIjoiQW5pcnVkZGggRGV2IFVwYWRoeWF5IiwiaWF0IjoxNzA0ODM4NDM3LCJleHAiOjE3MDQ5MjQ4Mzd9.o9h5vznkR3CzesGaTP7X36rwpUXJboKPrk5p_ZrV00Y',
+  };
+};

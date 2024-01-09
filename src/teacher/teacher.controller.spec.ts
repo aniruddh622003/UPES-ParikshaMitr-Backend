@@ -5,7 +5,10 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import {
   createTeacherReq,
   createTeacherResp,
+  loginTeacherReq,
+  loginTeacherResp,
 } from '../../test/stubs/teacher.stub';
+import { TeacherLoginDto } from './dto/teacher-login';
 
 jest.mock('./teacher.service');
 
@@ -48,6 +51,28 @@ describe('TestController', () => {
       });
       test('then it should return formatted response', () => {
         expect(response).toEqual(createTeacherResp());
+      });
+    });
+  });
+
+  describe('Login Teacher', () => {
+    describe('when login is called', () => {
+      type LoginTeacherResponse = {
+        message: string;
+        token: string;
+      };
+      let response: LoginTeacherResponse;
+      let loginTeacherDto: TeacherLoginDto;
+      beforeEach(async () => {
+        loginTeacherDto = loginTeacherReq();
+        response = await teacherController.login(loginTeacherDto);
+      });
+
+      test('then it should call teacherService', () => {
+        expect(teacherService.login).toBeCalledWith(loginTeacherDto);
+      });
+      test('then it should return formatted response', () => {
+        expect(response).toEqual(loginTeacherResp());
       });
     });
   });
