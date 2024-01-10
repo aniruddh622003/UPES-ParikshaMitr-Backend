@@ -45,6 +45,7 @@ export class TeacherService {
           id: teacherData._id,
           sap_id: teacherData.sap_id,
           name: teacherData.name,
+          role: 'teacher',
         };
         return {
           message: 'Login successful',
