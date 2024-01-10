@@ -8,6 +8,9 @@ export class ExamController {
   @Prop()
   name: string;
 
+  @Prop({ unique: true })
+  username: string;
+
   @Prop()
   password: string;
 }

@@ -1,7 +1,7 @@
-import { ContGuardGuard } from './cont-guard.guard';
+import { ExamContGuard } from './cont-guard.guard';
 
 describe('ContGuardGuard', () => {
   it('should be defined', () => {
-    expect(new ContGuardGuard()).toBeDefined();
+    expect(new ExamContGuard()).toBeDefined();
   });
 });

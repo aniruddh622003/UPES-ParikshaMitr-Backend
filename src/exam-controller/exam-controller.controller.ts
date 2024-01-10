@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ExamControllerService } from './exam-controller.service';
 import { CreateExamControllerDto } from './dto/create-exam-controller.dto';
 import { UpdateExamControllerDto } from './dto/update-exam-controller.dto';
+import { LoginExamControllerDto } from './dto/exam-controller-login.dto';
+import { ExamContGuard } from '../guards/cont-guard.guard';
 
 @Controller('exam-controller')
 export class ExamControllerController {
@@ -18,6 +21,19 @@ export class ExamControllerController {
   @Post()
   create(@Body() createExamControllerDto: CreateExamControllerDto) {
     return this.examControllerService.create(createExamControllerDto);
+  }
+
+  @Post('login')
+  login(@Body() loginData: LoginExamControllerDto) {
+    return this.examControllerService.login(loginData);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Get('verifyLogin')
+  verifyLogin() {
+    return {
+      message: 'Login successful',
+    };
   }
 
   @Get()

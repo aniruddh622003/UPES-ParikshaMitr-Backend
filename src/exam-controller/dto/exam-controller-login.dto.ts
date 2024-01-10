@@ -1,10 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateExamControllerDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
+export class LoginExamControllerDto {
   @IsString()
   @IsNotEmpty()
   username: string;
