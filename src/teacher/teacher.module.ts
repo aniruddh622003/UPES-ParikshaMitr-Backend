@@ -8,9 +8,11 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Teacher.name, schema: TeacherSchema }]),
-    JwtModule.register({
-      secret: 'Test',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: '1d' },
+      }),
     }),
   ],
   controllers: [TeacherController],
