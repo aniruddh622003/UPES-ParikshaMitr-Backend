@@ -6,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Observable } from 'rxjs';
 
 @Injectable()
-export class JwtGuard implements CanActivate {
+export class ExamContGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,8 +26,18 @@ export class JwtGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
+      if (payload?.role !== 'exam-controller') {
+        throw new HttpException(
+          {
+            message: 'Invalid Role',
+          },
+          403,
+        );
+      }
       request['user'] = payload;
     } catch (err) {
+      if (err instanceof HttpException) throw err;
+      // console.log(err.message);
       throw new HttpException(
         {
           message: 'Invalid Token',

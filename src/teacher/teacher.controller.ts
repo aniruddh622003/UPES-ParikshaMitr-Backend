@@ -12,7 +12,7 @@ import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { TeacherLoginDto } from './dto/teacher-login';
-import { JwtGuard } from '../jwt.guard';
+import { TeacherJwtGuard } from '../guards/teacher-jwt.guard';
 
 @Controller('teacher')
 export class TeacherController {
@@ -28,7 +28,7 @@ export class TeacherController {
     return this.teacherService.login(teacherLoginDto);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(TeacherJwtGuard)
   @Get('verifyLogin')
   verifyLogin() {
     return {

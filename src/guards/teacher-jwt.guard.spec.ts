@@ -1,23 +1,44 @@
 import { JwtService } from '@nestjs/jwt';
-import { JwtGuard } from './jwt.guard';
+import { TeacherJwtGuard } from './teacher-jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { Test, TestingModule } from '@nestjs/testing';
-import { testToken } from '../test/stubs/jwt.stub';
-
-jest.mock('@nestjs/jwt');
+import { testInvalidToken, testTeacherToken } from '../../test/stubs/jwt.stub';
 
 describe('JwtGuard', () => {
-  let jwtGuard: JwtGuard;
+  let jwtGuard: TeacherJwtGuard;
   let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [JwtGuard, JwtService],
+      providers: [TeacherJwtGuard, JwtService],
     }).compile();
 
-    jwtGuard = module.get<JwtGuard>(JwtGuard);
+    jwtGuard = module.get<TeacherJwtGuard>(TeacherJwtGuard);
     jwtService = module.get<JwtService>(JwtService);
+    jwtService.verifyAsync = jest.fn().mockImplementation((token) => {
+      if (token === testTeacherToken()) {
+        return Promise.resolve({
+          id: '659d39aa4043122701a08c28',
+          sap_id: 500086707,
+          name: 'Aniruddh Dev Upadhyay',
+          role: 'teacher',
+        });
+      }
+      return Promise.resolve({
+        id: '659d39aa4043122701a08c28',
+        sap_id: 500086707,
+        name: 'Aniruddh Dev Upadhyay',
+        role: 'aa',
+      });
+    });
+
+    jwtService.signAsync = jest
+      .fn()
+      .mockResolvedValue(
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OWQzOWFhNDA0MzEyMjcwMWEwOGMyOCIsInNhcF9pZCI6NTAwMDg2NzA3LCJuYW1lIjoiQW5pcnVkZGggRGV2IFVwYWRoeWF5IiwiaWF0IjoxNzA0ODgzNTE2fQ.A4HgoX772BaWM3yESWRTbS3wvXT_4PV_k2_tDX1IRYU',
+      );
+
     jest.clearAllMocks();
   });
 
@@ -35,7 +56,7 @@ describe('JwtGuard', () => {
       beforeEach(async () => {
         request = {
           headers: {
-            authorization: 'Bearer ' + testToken(),
+            authorization: 'Bearer ' + testTeacherToken(),
           },
         } as any;
         context = {
@@ -43,16 +64,11 @@ describe('JwtGuard', () => {
             getRequest: () => request,
           }),
         } as any;
-        jest.spyOn(jwtService, 'verifyAsync').mockResolvedValueOnce({
-          id: 'id',
-          sap_id: 'sap_id',
-          name: 'name',
-        });
         result = await jwtGuard.canActivate(context);
       });
 
       test('then it should call jwtService', () => {
-        expect(jwtService.verifyAsync).toBeCalledWith(testToken(), {
+        expect(jwtService.verifyAsync).toBeCalledWith(testTeacherToken(), {
           secret: process.env.JWT_SECRET,
         });
       });
@@ -99,6 +115,29 @@ describe('JwtGuard', () => {
 
       test('then it should throw an error', async () => {
         await expect(jwtGuard.canActivate(context)).rejects.toThrowError();
+      });
+    });
+
+    describe('when role is not teacher', () => {
+      let request: Request;
+      let context: ExecutionContext;
+      beforeEach(async () => {
+        request = {
+          headers: {
+            authorization: 'Bearer ' + testInvalidToken(),
+          },
+        } as any;
+        context = {
+          switchToHttp: () => ({
+            getRequest: () => request,
+          }),
+        } as any;
+      });
+
+      test('then it should give error with message should be Invalid Role', async () => {
+        await expect(jwtGuard.canActivate(context)).rejects.toThrowError(
+          'Invalid Role',
+        );
       });
     });
   });
