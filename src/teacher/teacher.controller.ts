@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { TeacherLoginDto } from './dto/teacher-login';
+import { TeacherJwtGuard } from '../guards/teacher-jwt.guard';
 
 @Controller('teacher')
 export class TeacherController {
@@ -24,6 +26,14 @@ export class TeacherController {
   @Post('login')
   login(@Body() teacherLoginDto: TeacherLoginDto) {
     return this.teacherService.login(teacherLoginDto);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('verifyLogin')
+  verifyLogin() {
+    return {
+      message: 'Login verified',
+    };
   }
 
   @Get()
