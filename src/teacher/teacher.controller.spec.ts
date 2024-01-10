@@ -9,8 +9,10 @@ import {
   loginTeacherResp,
 } from '../../test/stubs/teacher.stub';
 import { TeacherLoginDto } from './dto/teacher-login';
+import { JwtService } from '@nestjs/jwt';
 
 jest.mock('./teacher.service');
+jest.mock('@nestjs/jwt');
 
 describe('TestController', () => {
   let teacherController: TeacherController;
@@ -20,7 +22,7 @@ describe('TestController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [],
       controllers: [TeacherController],
-      providers: [TeacherService],
+      providers: [TeacherService, JwtService],
     }).compile();
 
     teacherController = module.get<TeacherController>(TeacherController);
