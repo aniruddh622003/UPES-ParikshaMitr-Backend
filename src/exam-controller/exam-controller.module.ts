@@ -7,6 +7,7 @@ import {
   ExamControllerSchema,
 } from '../schemas/exam-controller.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { ContTeacherModule } from './teacher/cont-teacher.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
         signOptions: { expiresIn: '1d' },
       }),
     }),
+    ContTeacherModule,
   ],
   controllers: [ExamControllerController],
   providers: [ExamControllerService],

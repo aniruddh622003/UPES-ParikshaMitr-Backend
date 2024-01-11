@@ -74,7 +74,7 @@ export class ExamControllerService {
     return this.examControllerModel.find().exec();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} examController`;
   }
 

@@ -41,12 +41,12 @@ export class ExamControllerController {
     return this.examControllerService.findAll();
   }
 
-  @Get(':id')
+  @Get('find/:id')
   findOne(@Param('id') id: string) {
-    return this.examControllerService.findOne(+id);
+    return this.examControllerService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(
     @Param('id') id: string,
     @Body() updateExamControllerDto: UpdateExamControllerDto,
@@ -54,7 +54,7 @@ export class ExamControllerController {
     return this.examControllerService.update(+id, updateExamControllerDto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.examControllerService.remove(+id);
   }

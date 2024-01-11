@@ -1,4 +1,3 @@
-import { HttpException } from '@nestjs/common';
 import {
   createTeacherResp,
   findTeacherID,
