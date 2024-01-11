@@ -5,6 +5,8 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import {
   createTeacherReq,
   createTeacherResp,
+  findTeacherID,
+  findTeacherbyIDResp,
   loginTeacherReq,
   loginTeacherResp,
 } from '../../test/stubs/teacher.stub';
@@ -75,6 +77,28 @@ describe('TestController', () => {
       });
       test('then it should return formatted response', () => {
         expect(response).toEqual(loginTeacherResp());
+      });
+    });
+  });
+
+  describe('Find Teacher', () => {
+    const id = findTeacherID();
+    describe('when find is called', () => {
+      test('then it should call teacherService', async () => {
+        await teacherController.findOne(id);
+        expect(teacherService.findOne).toBeCalledWith(id);
+      });
+      test('then it should return formatted response', async () => {
+        const response = await teacherController.findOne(id);
+        expect(response).toEqual(findTeacherbyIDResp());
+      });
+    });
+    describe('when find is called with invalid id', () => {
+      test('then it should throw an error', async () => {
+        const invalidId = 'invalidId';
+        await expect(
+          teacherController.findOne(invalidId),
+        ).rejects.toThrowError();
       });
     });
   });
