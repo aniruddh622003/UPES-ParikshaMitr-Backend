@@ -69,12 +69,35 @@ export class TeacherService {
     }
   }
 
-  findAll(): Promise<Teacher[]> {
-    return this.teacherModel.find().exec();
+  async findAll() {
+    const teachers = await this.teacherModel.find().exec();
+    const result = teachers.map((teacher) => {
+      const x = teacher.toObject();
+      delete x.password;
+      return x;
+    });
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`;
+  async findOne(id: string) {
+    try {
+      const teacher: Teacher = await this.teacherModel.findById(id).exec();
+      return {
+        message: 'Teacher found',
+        data: {
+          sap_id: teacher.sap_id,
+          name: teacher.name,
+          approved: teacher.approved,
+        },
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          message: 'Teacher not found',
+        },
+        404,
+      );
+    }
   }
 
   update(id: number, updateTeacherDto: UpdateTeacherDto) {
