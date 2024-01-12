@@ -4,6 +4,7 @@ import { TeacherController } from './teacher.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Teacher, TeacherSchema } from '../schemas/teacher.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { InvigilationModule } from './invigilation/invigilation.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JwtModule } from '@nestjs/jwt';
         signOptions: { expiresIn: '1d' },
       }),
     }),
+    InvigilationModule,
   ],
   controllers: [TeacherController],
   providers: [TeacherService],
