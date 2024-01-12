@@ -88,6 +88,12 @@ export class InvigilationService {
     }
     await roomInvigilator.save();
 
-    return roomInvigilator;
+    return {
+      message: `Invigilator assigned`,
+      data: {
+        room: roomInvigilator.room_id,
+        invigilator1: roomInvigilator.invigilator1_id,
+      },
+    };
   }
 }

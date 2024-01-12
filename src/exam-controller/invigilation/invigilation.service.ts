@@ -34,4 +34,50 @@ export class InvigilationService {
       message: `Created Room No: ${room.room_no}, ID: ${room._id}`,
     };
   }
+
+  async getRoomWithApprovalPendingInvigilator() {
+    const roomswithPendingInvigilator = await this.roomInvigilatorModel
+      .find({
+        $or: [
+          {
+            $and: [
+              { invigilator1_controller_approval: false },
+              {
+                invigilator1_id: { $ne: null },
+              },
+            ],
+          },
+          {
+            $and: [
+              { invigilator2_controller_approval: false },
+              {
+                invigilator2_id: { $ne: null },
+              },
+            ],
+          },
+        ],
+      })
+      .populate('invigilator1_id')
+      .populate('invigilator2_id')
+      .populate('room_id');
+    const returnObj = roomswithPendingInvigilator.map((room) => {
+      const temp = {};
+      temp['room'] = room.room_id;
+      if (room.invigilator1_id) {
+        temp['invigilator1'] = room.invigilator1_id;
+      }
+      if (room.invigilator2_id) {
+        temp['invigilator2'] = room.invigilator2_id;
+      }
+      return temp;
+    });
+    return returnObj;
+  }
+
+  approveInvigilator(approveInvigilatorDto) {
+    const room = this.roomModel.findById(approveInvigilatorDto.roomId);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+  }
 }
