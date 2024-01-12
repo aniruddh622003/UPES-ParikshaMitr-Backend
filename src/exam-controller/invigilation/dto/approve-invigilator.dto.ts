@@ -8,4 +8,8 @@ export class ApproveInvigilatorDto {
   @IsNotEmpty()
   @IsString()
   roomId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  controllerId: string;
 }

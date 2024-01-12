@@ -7,6 +7,7 @@ import {
   RoomInvigilatorDocument,
 } from '../../schemas/room-invigilator.schema';
 import { Model } from 'mongoose';
+import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -74,10 +75,50 @@ export class InvigilationService {
     return returnObj;
   }
 
-  approveInvigilator(approveInvigilatorDto) {
-    const room = this.roomModel.findById(approveInvigilatorDto.roomId);
+  async approveInvigilator(approveInvigilatorDto: ApproveInvigilatorDto) {
+    const room = await this.roomModel.findById(approveInvigilatorDto.roomId);
     if (!room) {
       throw new HttpException('Room not found', 404);
     }
+
+    const roomInvigilator = await this.roomInvigilatorModel.findById(
+      room.room_invigilator_id,
+    );
+
+    let approvedInvigilator;
+
+    if (
+      roomInvigilator.invigilator1_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      roomInvigilator.invigilator1_controller_approval = true;
+      roomInvigilator.invigilator1_controller_approved_by =
+        approveInvigilatorDto.controllerId;
+      await roomInvigilator.populate('invigilator1_id', 'sap_id name');
+      approvedInvigilator = roomInvigilator.invigilator1_id;
+    } else if (
+      roomInvigilator.invigilator2_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      roomInvigilator.invigilator2_controller_approval = true;
+      roomInvigilator.invigilator2_controller_approved_by =
+        approveInvigilatorDto.controllerId;
+      await roomInvigilator.populate('invigilator2_id', 'sap_id name');
+      approvedInvigilator = roomInvigilator.invigilator2_id;
+    } else {
+      throw new HttpException('Bad request', 400);
+    }
+
+    await roomInvigilator.save();
+
+    // delete password field from approved invigilator
+    delete approvedInvigilator.password;
+
+    return {
+      message: 'Invigilator approved',
+      data: {
+        invigilator: approvedInvigilator,
+      },
+    };
   }
 }
