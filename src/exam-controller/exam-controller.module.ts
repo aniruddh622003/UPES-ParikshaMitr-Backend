@@ -8,6 +8,7 @@ import {
 } from '../schemas/exam-controller.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ContTeacherModule } from './teacher/cont-teacher.module';
+import { InvigilationModule } from './invigilation/invigilation.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ContTeacherModule } from './teacher/cont-teacher.module';
       }),
     }),
     ContTeacherModule,
+    InvigilationModule,
   ],
   controllers: [ExamControllerController],
   providers: [ExamControllerService],
