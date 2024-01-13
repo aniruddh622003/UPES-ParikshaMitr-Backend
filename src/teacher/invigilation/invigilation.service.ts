@@ -7,6 +7,7 @@ import {
   RoomInvigilatorDocument,
 } from '../../schemas/room-invigilator.schema';
 import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
+import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -17,7 +18,6 @@ export class InvigilationService {
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
-  //TODO: Controller Approval and Teacher Approval
   async assignInvigilator(assignInvigilatorDto: AssignInvigilatorDto) {
     const { invigilator_id, unique_code } = assignInvigilatorDto;
 
@@ -94,6 +94,45 @@ export class InvigilationService {
         room: roomInvigilator.room_id,
         invigilator1: roomInvigilator.invigilator1_id,
       },
+    };
+  }
+
+  async approveInvigilator(approveInvigilatorDto: ApproveInvigilatorDto) {
+    // return approveInvigilatorDto;
+    const roomInvigilator = await this.roomInvigilatorModel.findOne({
+      room_id: approveInvigilatorDto.roomId,
+    });
+    if (!roomInvigilator) {
+      throw new HttpException('Room not found', 404);
+    }
+    if (
+      roomInvigilator.invigilator1_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      if (roomInvigilator.invigilator1_teacher_approval) {
+        throw new HttpException('Invigilator already approved', 304);
+      }
+      if (!roomInvigilator.invigilator1_controller_approval) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+      roomInvigilator.invigilator1_teacher_approval = true;
+    } else if (
+      roomInvigilator.invigilator2_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      if (roomInvigilator.invigilator2_teacher_approval) {
+        throw new HttpException('Invigilator already approved', 304);
+      }
+      if (!roomInvigilator.invigilator2_controller_approval) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+      roomInvigilator.invigilator2_teacher_approval = true;
+    } else {
+      throw new HttpException('Bad request', 400);
+    }
+    await roomInvigilator.save();
+    return {
+      message: 'Teacher Approval Collected',
     };
   }
 }
