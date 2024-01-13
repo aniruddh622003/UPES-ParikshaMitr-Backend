@@ -1,4 +1,4 @@
-name: Node.js CI on Main Branch
+name: Node.js CI on Dev Branch
 
 on:
   push:
