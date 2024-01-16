@@ -8,6 +8,7 @@ import {
 } from '../../schemas/room-invigilator.schema';
 import { Model } from 'mongoose';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
+import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -119,6 +120,26 @@ export class InvigilationService {
       data: {
         invigilator: approvedInvigilator,
       },
+    };
+  }
+
+  async createSeatingPlan(body: CreateSeatingPlanDto) {
+    const roomDoc = await this.roomModel.findById(body.room_id);
+    if (!roomDoc) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    roomDoc.students = body.seating_plan as any;
+    try {
+      await roomDoc.save({
+        validateBeforeSave: true,
+      });
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
+
+    return {
+      message: 'Seating plan updated',
     };
   }
 }
