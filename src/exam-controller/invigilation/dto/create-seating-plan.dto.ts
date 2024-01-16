@@ -41,5 +41,5 @@ export class CreateSeatingPlanDto {
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => Student)
-  seating_plan: Student;
+  seating_plan: Student[];
 }

@@ -22,8 +22,25 @@ export class Room {
   // TODO: Add UFM Details
   @Prop({
     default: [],
+    _id: false,
+    type: [
+      {
+        sap_id: Number,
+        roll_no: String,
+        student_name: String,
+        course: String,
+        subject: String,
+        subject_code: String,
+        seat_no: String,
+        eligible: {
+          type: String,
+          enum: ['YES', 'F_HOLD', 'DEBARRED'],
+          default: 'YES',
+        },
+      },
+    ],
   })
-  student: [
+  students: [
     {
       sap_id: number;
       roll_no: string;

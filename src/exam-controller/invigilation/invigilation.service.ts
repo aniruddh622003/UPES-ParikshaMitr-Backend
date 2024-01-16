@@ -123,13 +123,23 @@ export class InvigilationService {
     };
   }
 
-  createSeatingPlan(body: CreateSeatingPlanDto) {
+  async createSeatingPlan(body: CreateSeatingPlanDto) {
+    const roomDoc = await this.roomModel.findById(body.room_id);
+    if (!roomDoc) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    roomDoc.students = body.seating_plan as any;
+    try {
+      await roomDoc.save({
+        validateBeforeSave: true,
+      });
+    } catch (err) {
+      throw new HttpException(err.message, 400);
+    }
+
     return {
-      message: 'Seating plan created',
-      data: {
-        room: body.room_id,
-        seating_plan: body.seating_plan,
-      },
+      message: 'Seating plan updated',
     };
   }
 }
