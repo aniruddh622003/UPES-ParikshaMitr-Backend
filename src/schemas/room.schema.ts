@@ -31,6 +31,7 @@ export class Room {
       course: string;
       subject: string;
       subject_code: string;
+      seat_no: string;
       eligible: {
         type: string;
         enum: ['YES', 'F_HOLD', 'DEBARRED'];

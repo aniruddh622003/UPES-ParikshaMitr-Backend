@@ -8,6 +8,7 @@ import {
 } from '../../schemas/room-invigilator.schema';
 import { Model } from 'mongoose';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
+import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -118,6 +119,16 @@ export class InvigilationService {
       message: 'Invigilator approved',
       data: {
         invigilator: approvedInvigilator,
+      },
+    };
+  }
+
+  createSeatingPlan(body: CreateSeatingPlanDto) {
+    return {
+      message: 'Seating plan created',
+      data: {
+        room: body.room_id,
+        seating_plan: body.seating_plan,
       },
     };
   }

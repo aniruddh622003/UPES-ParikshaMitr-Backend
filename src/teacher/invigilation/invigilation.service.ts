@@ -135,4 +135,13 @@ export class InvigilationService {
       message: 'Teacher Approval Collected',
     };
   }
+
+  getSeatingPlan(room_id: string) {
+    return {
+      message: 'Seating Plan',
+      data: {
+        room_id,
+      },
+    };
+  }
 }
