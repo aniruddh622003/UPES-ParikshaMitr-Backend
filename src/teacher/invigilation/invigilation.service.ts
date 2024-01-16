@@ -136,11 +136,35 @@ export class InvigilationService {
     };
   }
 
-  getSeatingPlan(room_id: string) {
+  async getSeatingPlan(room_id: string) {
+    const room = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const highestSeatNo = room.students.reduce((prev, curr) => {
+      return prev.seat_no > curr.seat_no ? prev : curr;
+    }).seat_no;
+
+    const totalStudents = room.students.length;
+    const DebarredStudents = room.students.filter(
+      (student) => (student.eligible as any) === 'DEBARRED',
+    ).length;
+    const F_HoldStudents = room.students.filter(
+      (student) => (student.eligible as any) === 'F_HOLD',
+    ).length;
+    const eligibleStudents = totalStudents - DebarredStudents - F_HoldStudents;
+
     return {
       message: 'Seating Plan',
       data: {
-        room_id,
+        room_no: room.room_no,
+        total_students: totalStudents,
+        eligible_students: eligibleStudents,
+        debarred_students: DebarredStudents,
+        f_hold_students: F_HoldStudents,
+        highest_seat_no: highestSeatNo,
+        seating_plan: room.students,
       },
     };
   }
