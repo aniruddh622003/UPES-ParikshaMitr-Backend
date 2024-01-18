@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { InvigilationService } from './invigilation.service';
 import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
 import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
+import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
@@ -20,5 +21,10 @@ export class InvigilationController {
   @Get('seating-plan')
   getSeatingPlan(@Query('room_id') room_id: string) {
     return this.invigilationService.getSeatingPlan(room_id);
+  }
+
+  @Post('mark-attendance')
+  markAttendance(@Body() body: MarkAttendanceDto) {
+    return this.invigilationService.markAttendance(body);
   }
 }
