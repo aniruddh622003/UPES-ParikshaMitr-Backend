@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Mongoose } from 'mongoose';
 
 export type RoomDocument = HydratedDocument<Room>;
 
@@ -37,6 +37,22 @@ export class Room {
           enum: ['YES', 'F_HOLD', 'DEBARRED'],
           default: 'YES',
         },
+        ans_sheet_number: {
+          type: Number,
+          default: null,
+        },
+        attendance: {
+          type: Boolean,
+          default: false,
+        },
+        attendance_time: {
+          type: Date,
+          default: null,
+        },
+        attendance_by: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: null,
+        },
       },
     ],
   })
@@ -54,6 +70,10 @@ export class Room {
         enum: ['YES', 'F_HOLD', 'DEBARRED'];
         default: 'YES';
       };
+      ans_sheet_number?: number;
+      attendance?: boolean;
+      attendance_time?: Date;
+      attendance_by?: string;
     },
   ];
 }

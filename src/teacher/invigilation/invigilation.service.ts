@@ -8,6 +8,7 @@ import {
 } from '../../schemas/room-invigilator.schema';
 import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
 import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
+import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -166,6 +167,63 @@ export class InvigilationService {
         highest_seat_no: highestSeatNo,
         seating_plan: room.students,
       },
+    };
+  }
+
+  async markAttendance(body: MarkAttendanceDto) {
+    const { room_id, invigilator_id, sap_id, ans_sheet_number } = body;
+    const checkInv = await this.roomInvigilatorModel.findOne({
+      room_id,
+      $or: [
+        {
+          invigilator1_id: invigilator_id,
+        },
+        {
+          invigilator2_id: invigilator_id,
+        },
+      ],
+    });
+    if (!checkInv) {
+      throw new HttpException('Invigilator not assigned to this room', 401);
+    }
+
+    const room = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const stuIdx = room.students.findIndex(
+      (student) => student.sap_id === sap_id,
+    );
+    if (stuIdx === -1) {
+      throw new HttpException('Student not found', 404);
+    }
+
+    if (room.students[stuIdx].attendance) {
+      throw new HttpException('Attendance already marked', 409);
+    }
+
+    if (room.students[stuIdx].eligible !== ('YES' as any)) {
+      let message = `Student is not Eligible because of `;
+      if (room.students[stuIdx].eligible === ('DEBARRED' as any)) {
+        message += `Debarred`;
+      }
+      if (room.students[stuIdx].eligible === ('F_HOLD' as any)) {
+        message += `Financial Hold`;
+      }
+      throw new HttpException(message, 400);
+    }
+
+    room.students[stuIdx].attendance = true;
+    room.students[stuIdx].attendance_time = new Date();
+    room.students[stuIdx].attendance_by = invigilator_id;
+    room.students[stuIdx].ans_sheet_number = ans_sheet_number;
+
+    await room.save();
+
+    return {
+      message: 'Attendance marked',
+      data: room.students[stuIdx],
     };
   }
 }
