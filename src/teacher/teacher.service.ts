@@ -7,11 +7,13 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { TeacherLoginDto } from './dto/teacher-login';
 import { JwtService } from '@nestjs/jwt';
+import { Schedule } from '../schemas/schedule.schema';
 
 @Injectable()
 export class TeacherService {
   constructor(
     @InjectModel(Teacher.name) private teacherModel: Model<Teacher>,
+    @InjectModel(Schedule.name) private scheduleModel: Model<Schedule>,
     private jwtService: JwtService,
   ) {}
 
@@ -106,5 +108,12 @@ export class TeacherService {
 
   remove(id: number) {
     return `This action removes a #${id} teacher`;
+  }
+
+  getSchedule(user: any) {
+    const schedule = this.scheduleModel.find({
+      participants: user._id,
+    });
+    return schedule;
   }
 }
