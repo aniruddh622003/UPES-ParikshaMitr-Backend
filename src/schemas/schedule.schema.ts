@@ -19,6 +19,9 @@ export class Schedule {
   @Prop()
   event_end_time: Date;
 
+  @Prop()
+  location: string;
+
   @Prop({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Teacher',

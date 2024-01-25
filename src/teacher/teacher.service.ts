@@ -8,6 +8,15 @@ import * as bcrypt from 'bcrypt';
 import { TeacherLoginDto } from './dto/teacher-login';
 import { JwtService } from '@nestjs/jwt';
 import { Schedule } from '../schemas/schedule.schema';
+import {
+  add,
+  differenceInCalendarDays,
+  format,
+  isBefore,
+  isEqual,
+  max,
+  min,
+} from 'date-fns';
 
 @Injectable()
 export class TeacherService {
@@ -110,10 +119,43 @@ export class TeacherService {
     return `This action removes a #${id} teacher`;
   }
 
-  getSchedule(user: any) {
-    const schedule = this.scheduleModel.find({
-      participants: user._id,
+  async getSchedule(user: any) {
+    const schedule = await this.scheduleModel.find({
+      participants: user.id,
     });
+    const mindate: Date = min(schedule.map((event) => event.event_start_time)),
+      maxdate: Date = max(schedule.map((event) => event.event_end_time));
+
+    const returnSchedule = {};
+    for (
+      let i = mindate;
+      differenceInCalendarDays(i, maxdate) <= 0;
+      i = add(i, { days: 1 })
+    ) {
+      const dayObject = [];
+      schedule.forEach((event) => {
+        if (event.event_start_time.getDate() === i.getDate()) {
+          dayObject.push({
+            timeSlot:
+              event.event_start_time.toLocaleTimeString() +
+              ' - ' +
+              event.event_end_time.toLocaleTimeString(),
+            eventName: event.event_name,
+            eventDescription: event.event_description,
+            location: event.location,
+          });
+        }
+        if (dayObject.length > 0) {
+          returnSchedule[format(i, 'yyyy-MM-dd')] = dayObject;
+        }
+      });
+    }
+    return {
+      mindate,
+      maxdate,
+      returnSchedule,
+    };
+
     return schedule;
   }
 }
