@@ -151,11 +151,7 @@ export class TeacherService {
       });
     }
     return {
-      mindate,
-      maxdate,
       returnSchedule,
     };
-
-    return schedule;
   }
 }
