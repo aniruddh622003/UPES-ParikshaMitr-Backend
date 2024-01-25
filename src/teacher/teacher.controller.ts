@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   HttpException,
+  Req,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -35,6 +36,12 @@ export class TeacherController {
     return {
       message: 'Login verified',
     };
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('getSchedule')
+  getSchedule(@Req() req) {
+    return this.teacherService.getSchedule(req?.user);
   }
 
   @Get()
