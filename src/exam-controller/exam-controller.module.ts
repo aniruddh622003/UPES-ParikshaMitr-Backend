@@ -9,11 +9,16 @@ import {
 import { JwtModule } from '@nestjs/jwt';
 import { ContTeacherModule } from './teacher/cont-teacher.module';
 import { InvigilationModule } from './invigilation/invigilation.module';
+import {
+  Notification,
+  NotificationSchema,
+} from '../schemas/notification.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: ExamController.name, schema: ExamControllerSchema },
+      { name: Notification.name, schema: NotificationSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

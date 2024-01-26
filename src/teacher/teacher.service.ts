@@ -17,12 +17,18 @@ import {
   max,
   min,
 } from 'date-fns';
+import {
+  Notification,
+  NotificationDocument,
+} from '../schemas/notification.schema';
 
 @Injectable()
 export class TeacherService {
   constructor(
     @InjectModel(Teacher.name) private teacherModel: Model<Teacher>,
     @InjectModel(Schedule.name) private scheduleModel: Model<Schedule>,
+    @InjectModel(Notification.name)
+    private notificationModel: Model<Notification>,
     private jwtService: JwtService,
   ) {}
 
@@ -152,6 +158,30 @@ export class TeacherService {
     }
     return {
       returnSchedule,
+    };
+  }
+
+  async getNotifications() {
+    const notifications = await this.notificationModel
+      .find()
+      .populate('sender')
+      .exec();
+    return {
+      message: 'Notifications found',
+      data: {
+        notifications: [
+          ...notifications.map((notification) => {
+            notification = notification.toObject() as NotificationDocument;
+            return {
+              _id: notification._id,
+              title: notification.title,
+              sender: (notification.sender as any).name,
+              message: notification.message,
+              createdAt: (notification as any).createdAt,
+            };
+          }),
+        ],
+      },
     };
   }
 }

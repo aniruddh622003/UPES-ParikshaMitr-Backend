@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ExamControllerService } from './exam-controller.service';
 import { CreateExamControllerDto } from './dto/create-exam-controller.dto';
 import { UpdateExamControllerDto } from './dto/update-exam-controller.dto';
 import { LoginExamControllerDto } from './dto/exam-controller-login.dto';
 import { ExamContGuard } from '../guards/cont-guard.guard';
+import { CreateNotificationDto } from './dto/create-notification.dto';
 
 @Controller('exam-controller')
 export class ExamControllerController {
@@ -34,6 +36,18 @@ export class ExamControllerController {
     return {
       message: 'Login successful',
     };
+  }
+
+  @UseGuards(ExamContGuard)
+  @Post('create-notification')
+  createNotification(
+    @Body() notificationData: CreateNotificationDto,
+    @Req() req,
+  ) {
+    return this.examControllerService.createNotification(
+      notificationData,
+      req?.user.id,
+    );
   }
 
   @Get()
