@@ -7,12 +7,16 @@ import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { ExamController } from '../schemas/exam-controller.schema';
 import { LoginExamControllerDto } from './dto/exam-controller-login.dto';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { Notification } from '../schemas/notification.schema';
 
 @Injectable()
 export class ExamControllerService {
   constructor(
     @InjectModel(ExamController.name)
     private examControllerModel: Model<ExamController>,
+    @InjectModel(Notification.name)
+    private notificationModel: Model<Notification>,
     private jwtService: JwtService,
   ) {}
 
@@ -68,6 +72,23 @@ export class ExamControllerService {
         404,
       );
     }
+  }
+
+  async createNotification(
+    notificationData: CreateNotificationDto,
+    userId: string,
+  ) {
+    const createdNotification = new this.notificationModel({
+      ...notificationData,
+      sender: userId,
+    });
+    await createdNotification.save();
+    return {
+      message: 'Notification created successfully',
+      data: {
+        createdNotification,
+      },
+    };
   }
 
   findAll() {
