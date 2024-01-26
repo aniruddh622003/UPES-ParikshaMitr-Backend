@@ -44,6 +44,12 @@ export class TeacherController {
     return this.teacherService.getSchedule(req?.user);
   }
 
+  @UseGuards(TeacherJwtGuard)
+  @Get('get-notifications')
+  getNotifications() {
+    return this.teacherService.getNotifications();
+  }
+
   @Get()
   findAll() {
     return this.teacherService.findAll();

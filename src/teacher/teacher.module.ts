@@ -6,12 +6,17 @@ import { Teacher, TeacherSchema } from '../schemas/teacher.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { InvigilationModule } from './invigilation/invigilation.module';
 import { Schedule, ScheduleSchema } from '../schemas/schedule.schema';
+import {
+  Notification,
+  NotificationSchema,
+} from '../schemas/notification.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Teacher.name, schema: TeacherSchema },
       { name: Schedule.name, schema: ScheduleSchema },
+      { name: Notification.name, schema: NotificationSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

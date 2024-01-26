@@ -20,6 +20,7 @@ export class Notification {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'ExamController',
   })
   sender: string;
 }
