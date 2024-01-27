@@ -9,6 +9,8 @@ import {
 import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
 import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
+import { format } from 'date-fns';
+import { Slot, SlotDocument } from '../../schemas/slot.schema';
 
 @Injectable()
 export class InvigilationService {
@@ -16,19 +18,32 @@ export class InvigilationService {
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     @InjectModel(RoomInvigilator.name)
     private roomInvigilatorModel: Model<RoomInvigilatorDocument>,
+    @InjectModel(Slot.name) private slotModel: Model<Slot>,
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
   async assignInvigilator(assignInvigilatorDto: AssignInvigilatorDto) {
     const { invigilator_id, unique_code } = assignInvigilatorDto;
 
+    const curr_date = format(new Date(), 'yyyy-MM-dd');
+    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
+
+    const curr_slot = await this.slotModel.findOne({
+      date: curr_date,
+      timeSlot: curr_time_slot,
+    });
+
+    if (!curr_slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
     // Unique code is used to prevent unauthorized access
-    if (unique_code !== '123456') {
+    if (unique_code !== curr_slot.uniqueCode) {
       throw new HttpException('Invalid unique code', 400);
     }
 
     // Check if invigilator is already assigned
-    const AllRooms = await this.roomModel.find().select('_id');
+    const AllRooms = curr_slot.rooms;
     const checkInvigilator = await this.roomInvigilatorModel.findOne({
       room_id: { $in: AllRooms },
       $or: [
@@ -54,12 +69,6 @@ export class InvigilationService {
           },
           {
             invigilator2_id: null,
-          },
-          {
-            invigilator1_controller_approval: false,
-          },
-          {
-            invigilator2_controller_approval: false,
           },
         ],
       })
@@ -99,7 +108,6 @@ export class InvigilationService {
   }
 
   async approveInvigilator(approveInvigilatorDto: ApproveInvigilatorDto) {
-    // return approveInvigilatorDto;
     const roomInvigilator = await this.roomInvigilatorModel.findOne({
       room_id: approveInvigilatorDto.roomId,
     });
