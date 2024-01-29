@@ -81,7 +81,10 @@ export class InvigilationService {
     return returnObj;
   }
 
-  async approveInvigilator(approveInvigilatorDto: ApproveInvigilatorDto) {
+  async approveInvigilator(
+    approveInvigilatorDto: ApproveInvigilatorDto,
+    controllerId: string,
+  ) {
     const room = await this.roomModel.findById(approveInvigilatorDto.roomId);
     if (!room) {
       throw new HttpException('Room not found', 404);
@@ -98,8 +101,7 @@ export class InvigilationService {
       approveInvigilatorDto.invigilatorId
     ) {
       roomInvigilator.invigilator1_controller_approval = true;
-      roomInvigilator.invigilator1_controller_approved_by =
-        approveInvigilatorDto.controllerId;
+      roomInvigilator.invigilator1_controller_approved_by = controllerId;
       await roomInvigilator.populate('invigilator1_id', 'sap_id name');
       approvedInvigilator = roomInvigilator.invigilator1_id;
     } else if (
@@ -107,8 +109,7 @@ export class InvigilationService {
       approveInvigilatorDto.invigilatorId
     ) {
       roomInvigilator.invigilator2_controller_approval = true;
-      roomInvigilator.invigilator2_controller_approved_by =
-        approveInvigilatorDto.controllerId;
+      roomInvigilator.invigilator2_controller_approved_by = controllerId;
       await roomInvigilator.populate('invigilator2_id', 'sap_id name');
       approvedInvigilator = roomInvigilator.invigilator2_id;
     } else {

@@ -8,6 +8,7 @@ import {
   RoomInvigilatorSchema,
 } from '../../schemas/room-invigilator.schema';
 import { Slot, SlotSchema } from '../../schemas/slot.schema';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -16,6 +17,12 @@ import { Slot, SlotSchema } from '../../schemas/slot.schema';
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
       { name: Slot.name, schema: SlotSchema },
     ]),
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: '1d' },
+      }),
+    }),
   ],
   controllers: [InvigilationController],
   providers: [InvigilationService],
