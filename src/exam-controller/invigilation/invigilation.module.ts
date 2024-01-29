@@ -7,12 +7,14 @@ import {
   RoomInvigilator,
   RoomInvigilatorSchema,
 } from '../../schemas/room-invigilator.schema';
+import { Slot, SlotSchema } from '../../schemas/slot.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Room.name, schema: RoomSchema },
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
+      { name: Slot.name, schema: SlotSchema },
     ]),
   ],
   controllers: [InvigilationController],

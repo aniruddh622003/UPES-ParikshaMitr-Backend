@@ -13,10 +13,22 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
 import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
 import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
+import { CreateSlotDto } from './dto/create-slot.dto';
+import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 
 @Controller('exam-controller/invigilation')
 export class InvigilationController {
   constructor(private readonly invigilationService: InvigilationService) {}
+
+  @Post('/slot')
+  createSlot(@Body() body: CreateSlotDto) {
+    return this.invigilationService.createSlot(body);
+  }
+
+  @Patch('/slot/add-room')
+  addRoomToSlot(@Body() body: AddRoomToSlotDto) {
+    return this.invigilationService.addRoomToSlot(body);
+  }
 
   @Post('/room')
   createRoom(@Body() createRoomDto: CreateRoomDto) {

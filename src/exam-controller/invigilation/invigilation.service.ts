@@ -10,6 +10,9 @@ import { Model } from 'mongoose';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
 import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
 import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
+import { CreateSlotDto } from './dto/create-slot.dto';
+import { Slot, SlotDocument } from '../../schemas/slot.schema';
+import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 
 @Injectable()
 export class InvigilationService {
@@ -17,6 +20,7 @@ export class InvigilationService {
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     @InjectModel(RoomInvigilator.name)
     private roomInvigilatorModel: Model<RoomInvigilatorDocument>,
+    @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
   ) {}
 
   async createRoom(createRoomDto: CreateRoomDto) {
@@ -167,6 +171,33 @@ export class InvigilationService {
 
     return {
       message: 'Student eligibility updated',
+    };
+  }
+
+  async createSlot(body: CreateSlotDto) {
+    // Random alphanumeric code 10 characters long
+    const randomCode = Math.random().toString(36).substr(2, 10);
+
+    const slot = new this.slotModel({
+      ...body,
+      date: new Date(body.date).toISOString().split('T')[0],
+      uniqueCode: randomCode,
+    });
+    return await slot.save();
+  }
+
+  async addRoomToSlot(body: AddRoomToSlotDto) {
+    const slot = await this.slotModel.findById(body.slotId);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    (slot.rooms as any).addToSet(...body.roomIds);
+    await slot.save();
+
+    return {
+      message:
+        'Rooms added to slot, Date: ' + slot.date + ', Time: ' + slot.timeSlot,
     };
   }
 }
