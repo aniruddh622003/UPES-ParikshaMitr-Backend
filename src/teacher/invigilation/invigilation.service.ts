@@ -22,8 +22,12 @@ export class InvigilationService {
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
-  async assignInvigilator(assignInvigilatorDto: AssignInvigilatorDto) {
-    const { invigilator_id, unique_code } = assignInvigilatorDto;
+  async assignInvigilator(assignInvigilatorDto: AssignInvigilatorDto, id: any) {
+    const { unique_code } = assignInvigilatorDto;
+    const invigilator_id = id;
+    if (!invigilator_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
 
     const curr_date = format(new Date(), 'yyyy-MM-dd');
     const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
@@ -107,17 +111,21 @@ export class InvigilationService {
     };
   }
 
-  async approveInvigilator(approveInvigilatorDto: ApproveInvigilatorDto) {
+  async approveInvigilator(
+    approveInvigilatorDto: ApproveInvigilatorDto,
+    id: any,
+  ) {
+    const invigilatorId = id;
+    if (!invigilatorId) {
+      throw new HttpException('Unauthorized', 401);
+    }
     const roomInvigilator = await this.roomInvigilatorModel.findOne({
       room_id: approveInvigilatorDto.roomId,
     });
     if (!roomInvigilator) {
       throw new HttpException('Room not found', 404);
     }
-    if (
-      roomInvigilator.invigilator1_id.toString() ===
-      approveInvigilatorDto.invigilatorId
-    ) {
+    if (roomInvigilator.invigilator1_id.toString() === invigilatorId) {
       if (roomInvigilator.invigilator1_teacher_approval) {
         throw new HttpException('Invigilator already approved', 304);
       }
@@ -125,10 +133,7 @@ export class InvigilationService {
         throw new HttpException('Invigilator not approved by controller', 400);
       }
       roomInvigilator.invigilator1_teacher_approval = true;
-    } else if (
-      roomInvigilator.invigilator2_id.toString() ===
-      approveInvigilatorDto.invigilatorId
-    ) {
+    } else if (roomInvigilator.invigilator2_id.toString() === invigilatorId) {
       if (roomInvigilator.invigilator2_teacher_approval) {
         throw new HttpException('Invigilator already approved', 304);
       }
@@ -178,8 +183,12 @@ export class InvigilationService {
     };
   }
 
-  async markAttendance(body: MarkAttendanceDto) {
-    const { room_id, invigilator_id, sap_id, ans_sheet_number } = body;
+  async markAttendance(body: MarkAttendanceDto, id: any) {
+    const { room_id, sap_id, ans_sheet_number } = body;
+    const invigilator_id = id;
+    if (!invigilator_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
     const checkInv = await this.roomInvigilatorModel.findOne({
       room_id,
       $or: [
