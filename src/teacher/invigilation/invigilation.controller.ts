@@ -1,21 +1,44 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { InvigilationService } from './invigilation.service';
 import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
 import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
+import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
   constructor(private readonly invigilationService: InvigilationService) {}
 
+  @UseGuards(TeacherJwtGuard)
   @Post('assign-invigilator')
-  assignInvigilator(@Body() assignInvigilatorDto: AssignInvigilatorDto) {
-    return this.invigilationService.assignInvigilator(assignInvigilatorDto);
+  assignInvigilator(
+    @Body() assignInvigilatorDto: AssignInvigilatorDto,
+    @Req() req,
+  ) {
+    return this.invigilationService.assignInvigilator(
+      assignInvigilatorDto,
+      req?.user.id,
+    );
   }
 
+  @UseGuards(TeacherJwtGuard)
   @Post('approve-invigilator')
-  approveInvigilator(@Body() approveInvigilatorDto: ApproveInvigilatorDto) {
-    return this.invigilationService.approveInvigilator(approveInvigilatorDto);
+  approveInvigilator(
+    @Body() approveInvigilatorDto: ApproveInvigilatorDto,
+    @Req() req,
+  ) {
+    return this.invigilationService.approveInvigilator(
+      approveInvigilatorDto,
+      req?.user.id,
+    );
   }
 
   @Get('seating-plan')
@@ -23,8 +46,9 @@ export class InvigilationController {
     return this.invigilationService.getSeatingPlan(room_id);
   }
 
+  @UseGuards(TeacherJwtGuard)
   @Post('mark-attendance')
-  markAttendance(@Body() body: MarkAttendanceDto) {
-    return this.invigilationService.markAttendance(body);
+  markAttendance(@Body() body: MarkAttendanceDto, @Req() req) {
+    return this.invigilationService.markAttendance(body, req?.user.id);
   }
 }

@@ -4,9 +4,6 @@ export class MarkAttendanceDto {
   @IsString()
   room_id: string;
 
-  @IsString()
-  invigilator_id: string;
-
   @IsNumber()
   sap_id: number;
 
