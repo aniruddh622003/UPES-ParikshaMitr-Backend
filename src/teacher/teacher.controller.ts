@@ -38,6 +38,13 @@ export class TeacherController {
     };
   }
 
+  //TODO: Get details of the teacher from JWT
+  @UseGuards(TeacherJwtGuard)
+  @Get('getDetails')
+  getDetails(@Req() req) {
+    return this.teacherService.findOne(req?.user?.id);
+  }
+
   @UseGuards(TeacherJwtGuard)
   @Get('getSchedule')
   getSchedule(@Req() req) {
