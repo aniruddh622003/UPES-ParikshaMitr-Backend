@@ -41,6 +41,10 @@ export class Room {
           type: Number,
           default: null,
         },
+        b_sheet_count: {
+          type: Number,
+          default: 0,
+        },
         attendance: {
           type: Boolean,
           default: false,
@@ -72,6 +76,7 @@ export class Room {
       };
       ans_sheet_number?: number;
       attendance?: boolean;
+      b_sheet_count?: number;
       attendance_time?: Date;
       attendance_by?: string;
     },

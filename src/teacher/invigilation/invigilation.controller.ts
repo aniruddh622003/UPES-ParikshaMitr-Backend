@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Query,
   Req,
@@ -12,6 +13,7 @@ import { AssignInvigilatorDto } from '../dto/assign-invigilator.dto';
 import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
+import { IssueBSheetDto } from '../dto/issueBsheet.dto';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
@@ -50,5 +52,11 @@ export class InvigilationController {
   @Post('mark-attendance')
   markAttendance(@Body() body: MarkAttendanceDto, @Req() req) {
     return this.invigilationService.markAttendance(body, req?.user.id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Patch('issue-b-sheet')
+  issueBSheet(@Body() body: IssueBSheetDto) {
+    return this.invigilationService.issueBSheet(body);
   }
 }
