@@ -57,6 +57,16 @@ export class Room {
           type: mongoose.Schema.Types.ObjectId,
           default: null,
         },
+        UFM: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'UFM',
+          default: null,
+        },
+        UFM_by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Teacher',
+          default: null,
+        },
       },
     ],
   })
@@ -79,6 +89,8 @@ export class Room {
       b_sheet_count?: number;
       attendance_time?: Date;
       attendance_by?: string;
+      UFM?: string;
+      UFM_by?: string;
     },
   ];
 }
