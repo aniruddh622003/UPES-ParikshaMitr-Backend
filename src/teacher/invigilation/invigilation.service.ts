@@ -273,4 +273,31 @@ export class InvigilationService {
       message: 'B Sheet Issued to ' + student.student_name,
     };
   }
+
+  async getBSheet(room_id: string, sap_id: string) {
+    const room: RoomDocument = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const stuIdx = room.students.findIndex(
+      (student) => student.sap_id === parseInt(sap_id),
+    );
+
+    if (stuIdx === -1) {
+      throw new HttpException('Invalid Sap ID', 404);
+    }
+
+    const student = room.students[stuIdx];
+
+    return {
+      message: 'Student Info',
+      data: {
+        name: student.student_name,
+        sap_id: student.sap_id,
+        seat_no: student.seat_no,
+        b_sheet_count: student.b_sheet_count,
+      },
+    };
+  }
 }

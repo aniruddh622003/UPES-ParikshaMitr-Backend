@@ -59,4 +59,13 @@ export class InvigilationController {
   issueBSheet(@Body() body: IssueBSheetDto) {
     return this.invigilationService.issueBSheet(body);
   }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('get-b-sheet')
+  getBSheet(
+    @Query('room_id') room_id: string,
+    @Query('sap_id') sap_id: string,
+  ) {
+    return this.invigilationService.getBSheet(room_id, sap_id);
+  }
 }
