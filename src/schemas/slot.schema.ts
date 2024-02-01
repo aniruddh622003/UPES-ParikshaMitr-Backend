@@ -18,6 +18,9 @@ export class Slot {
 
   @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: 'Room' })
   rooms: string[];
+
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'UFM', default: [] })
+  ufms: string[];
 }
 
 export const SlotSchema = SchemaFactory.createForClass(Slot);

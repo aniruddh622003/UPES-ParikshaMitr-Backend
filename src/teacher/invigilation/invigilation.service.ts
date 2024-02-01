@@ -11,6 +11,7 @@ import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 import { format } from 'date-fns';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
+import { IssueBSheetDto } from '../dto/issueBsheet.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -241,6 +242,62 @@ export class InvigilationService {
     return {
       message: 'Attendance marked',
       data: room.students[stuIdx],
+    };
+  }
+
+  async issueBSheet(body: IssueBSheetDto) {
+    const room: RoomDocument = await this.roomModel.findById(body.room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const stuIdx = room.students.findIndex(
+      (student) => student.seat_no === body.seat_no,
+    );
+
+    if (stuIdx === -1) {
+      throw new HttpException('Invalid Seat Number', 404);
+    }
+
+    const student = room.students[stuIdx];
+
+    if (!student.attendance) {
+      throw new HttpException('Attendance not marked', 400);
+    }
+
+    student.b_sheet_count += body.count;
+
+    await room.save();
+
+    return {
+      message: 'B Sheet Issued to ' + student.student_name,
+    };
+  }
+
+  async getBSheet(room_id: string, sap_id: string) {
+    const room: RoomDocument = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const stuIdx = room.students.findIndex(
+      (student) => student.sap_id === parseInt(sap_id),
+    );
+
+    if (stuIdx === -1) {
+      throw new HttpException('Invalid Sap ID', 404);
+    }
+
+    const student = room.students[stuIdx];
+
+    return {
+      message: 'Student Info',
+      data: {
+        name: student.student_name,
+        sap_id: student.sap_id,
+        seat_no: student.seat_no,
+        b_sheet_count: student.b_sheet_count,
+      },
     };
   }
 }

@@ -32,6 +32,10 @@ export class Room {
         subject: String,
         subject_code: String,
         seat_no: String,
+        exam_type: {
+          type: String,
+          default: 'MIDSEM',
+        },
         eligible: {
           type: String,
           enum: ['YES', 'F_HOLD', 'DEBARRED'],
@@ -40,6 +44,10 @@ export class Room {
         ans_sheet_number: {
           type: Number,
           default: null,
+        },
+        b_sheet_count: {
+          type: Number,
+          default: 0,
         },
         attendance: {
           type: Boolean,
@@ -51,6 +59,16 @@ export class Room {
         },
         attendance_by: {
           type: mongoose.Schema.Types.ObjectId,
+          default: null,
+        },
+        UFM: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'UFM',
+          default: null,
+        },
+        UFM_by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Teacher',
           default: null,
         },
       },
@@ -65,6 +83,7 @@ export class Room {
       subject: string;
       subject_code: string;
       seat_no: string;
+      exam_type: string;
       eligible: {
         type: string;
         enum: ['YES', 'F_HOLD', 'DEBARRED'];
@@ -72,8 +91,11 @@ export class Room {
       };
       ans_sheet_number?: number;
       attendance?: boolean;
+      b_sheet_count?: number;
       attendance_time?: Date;
       attendance_by?: string;
+      UFM?: string;
+      UFM_by?: string;
     },
   ];
 }

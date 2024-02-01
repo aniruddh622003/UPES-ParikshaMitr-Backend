@@ -7,7 +7,7 @@ export type TeacherDocument = HydratedDocument<Teacher>;
   timestamps: true,
 })
 export class Teacher {
-  @Prop()
+  @Prop({ unique: true })
   sap_id: number;
 
   @Prop()

@@ -5,6 +5,7 @@ import { TeacherModule } from './teacher/teacher.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { ExamControllerModule } from './exam-controller/exam-controller.module';
+import { UfmModule } from './ufm/ufm.module';
 
 @Module({
   imports: [
@@ -16,6 +17,8 @@ import { ExamControllerModule } from './exam-controller/exam-controller.module';
     TeacherModule,
 
     ExamControllerModule,
+
+    UfmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
