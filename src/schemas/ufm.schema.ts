@@ -18,6 +18,7 @@ export class UFM {
       subject_code: String,
       subject_name: String,
     },
+    _id: false,
   })
   subject: {
     subject_code: string;
@@ -56,6 +57,7 @@ export class UFM {
       mobile: Number,
       emergency_contact: Number,
     },
+    _id: false,
   })
   student: {
     name: string;
@@ -74,6 +76,7 @@ export class UFM {
       communication_devices: Number,
       torn_book_pages: Number,
     },
+    _id: false,
   })
   incriminating_material: {
     printed_pages: number;
@@ -98,6 +101,7 @@ export class UFM {
       near_desk: Boolean,
       other: Boolean,
     },
+    _id: false,
   })
   recovered_from: {
     student_hand: boolean;

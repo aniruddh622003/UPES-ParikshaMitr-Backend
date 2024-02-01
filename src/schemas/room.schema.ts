@@ -32,6 +32,10 @@ export class Room {
         subject: String,
         subject_code: String,
         seat_no: String,
+        exam_type: {
+          type: String,
+          default: 'MIDSEM',
+        },
         eligible: {
           type: String,
           enum: ['YES', 'F_HOLD', 'DEBARRED'],
@@ -79,6 +83,7 @@ export class Room {
       subject: string;
       subject_code: string;
       seat_no: string;
+      exam_type: string;
       eligible: {
         type: string;
         enum: ['YES', 'F_HOLD', 'DEBARRED'];
