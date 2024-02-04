@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ContTeacherService } from './cont-teacher.provider';
@@ -16,11 +18,10 @@ import { ExamContGuard } from '../../guards/cont-guard.guard';
 export class ContTeacherController {
   constructor(private readonly contTeacherService: ContTeacherService) {}
 
-  @Get()
+  @UseGuards(ExamContGuard)
+  @Get('/approved')
   findAll() {
-    return {
-      message: 'Hello from teacher',
-    };
+    return this.contTeacherService.findApproved();
   }
 
   @UseGuards(ExamContGuard)
@@ -33,6 +34,18 @@ export class ContTeacherController {
   @Patch('approve/:id')
   approveTeacher(@Param('id') id: string) {
     return this.contTeacherService.approveTeacher(id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Patch('/disable/:id')
+  disableTeacher(@Param('id') id: string) {
+    return this.contTeacherService.disableTeacher(id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Put('/edit/:id')
+  editTeacher(@Param('id') id: string, @Body() body: any) {
+    return this.contTeacherService.editTeacher(id, body);
   }
 
   @UseGuards(ExamContGuard)
