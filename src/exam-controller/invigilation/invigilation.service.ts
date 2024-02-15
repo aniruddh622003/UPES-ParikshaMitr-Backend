@@ -23,9 +23,19 @@ export class InvigilationService {
     @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
   ) {}
 
+  async getSlots() {
+    return await this.slotModel.find();
+  }
+
+  async getSlot(id: string) {
+    return (await this.slotModel.findById(id)).populate('rooms ufms');
+  }
+
   async createRoom(createRoomDto: CreateRoomDto) {
     const room = new this.roomModel({
       room_no: createRoomDto.roomNo,
+      block: createRoomDto.block,
+      floor: createRoomDto.floor,
     });
 
     const room_id = room._id;
@@ -176,6 +186,13 @@ export class InvigilationService {
   }
 
   async createSlot(body: CreateSlotDto) {
+    const slotExists = await this.slotModel.findOne({
+      date: new Date(body.date).toISOString().split('T')[0],
+      timeSlot: body.timeSlot,
+    });
+    if (slotExists) {
+      throw new HttpException('Slot already exists', 409);
+    }
     // Random alphanumeric code 10 characters long
     const randomCode = Math.random().toString(36).substr(2, 10);
 

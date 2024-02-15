@@ -39,6 +39,12 @@ export class ExamControllerController {
   }
 
   @UseGuards(ExamContGuard)
+  @Get('get-notifications')
+  getNotifications() {
+    return this.examControllerService.getNotifications();
+  }
+
+  @UseGuards(ExamContGuard)
   @Post('create-notification')
   createNotification(
     @Body() notificationData: CreateNotificationDto,

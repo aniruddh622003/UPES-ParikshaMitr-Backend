@@ -5,18 +5,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { ExamController } from '../schemas/exam-controller.schema';
+import {
+  ExamController,
+  ExamControllerDocument,
+} from '../schemas/exam-controller.schema';
 import { LoginExamControllerDto } from './dto/exam-controller-login.dto';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { Notification } from '../schemas/notification.schema';
+import {
+  Notification,
+  NotificationDocument,
+} from '../schemas/notification.schema';
 
 @Injectable()
 export class ExamControllerService {
   constructor(
     @InjectModel(ExamController.name)
-    private examControllerModel: Model<ExamController>,
+    private examControllerModel: Model<ExamControllerDocument>,
     @InjectModel(Notification.name)
-    private notificationModel: Model<Notification>,
+    private notificationModel: Model<NotificationDocument>,
     private jwtService: JwtService,
   ) {}
 
@@ -72,6 +78,18 @@ export class ExamControllerService {
         404,
       );
     }
+  }
+
+  async getNotifications() {
+    const notifications = await this.notificationModel
+      .find()
+      .populate('sender', 'name');
+    return {
+      message: 'Notifications fetched successfully',
+      data: {
+        notifications,
+      },
+    };
   }
 
   async createNotification(

@@ -12,6 +12,12 @@ export class Room {
   })
   room_no: number;
 
+  @Prop()
+  block: string;
+
+  @Prop()
+  floor: number;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'RoomInvigilator',

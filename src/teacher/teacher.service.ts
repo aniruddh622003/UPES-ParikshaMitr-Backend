@@ -164,7 +164,7 @@ export class TeacherService {
   async getNotifications() {
     const notifications = await this.notificationModel
       .find()
-      .populate('sender')
+      .populate('sender', 'name')
       .exec();
     return {
       message: 'Notifications found',

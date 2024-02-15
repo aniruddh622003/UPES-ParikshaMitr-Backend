@@ -23,6 +23,18 @@ export class InvigilationController {
   constructor(private readonly invigilationService: InvigilationService) {}
 
   @UseGuards(ExamContGuard)
+  @Get('/slot')
+  getSlots() {
+    return this.invigilationService.getSlots();
+  }
+
+  @UseGuards(ExamContGuard)
+  @Get('/slot/:id')
+  getSlot(@Param('id') id: string) {
+    return this.invigilationService.getSlot(id);
+  }
+
+  @UseGuards(ExamContGuard)
   @Post('/slot')
   createSlot(@Body() body: CreateSlotDto) {
     return this.invigilationService.createSlot(body);
