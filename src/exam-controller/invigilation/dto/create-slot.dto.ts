@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 
 export class CreateSlotDto {
-  @IsDateString()
+  @IsString()
   date: Date;
 
   @IsString()

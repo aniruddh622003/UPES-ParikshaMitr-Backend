@@ -13,6 +13,7 @@ import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class InvigilationService {
@@ -24,7 +25,7 @@ export class InvigilationService {
   ) {}
 
   async getSlots() {
-    return await this.slotModel.find();
+    return await this.slotModel.find().sort({ date: 1, timeSlot: -1 });
   }
 
   async getSlot(id: string) {
@@ -186,8 +187,9 @@ export class InvigilationService {
   }
 
   async createSlot(body: CreateSlotDto) {
+    // return format(new Date(body.date), 'yyyy-MM-dd');
     const slotExists = await this.slotModel.findOne({
-      date: new Date(body.date).toISOString().split('T')[0],
+      date: format(new Date(body.date), 'yyyy-MM-dd'),
       timeSlot: body.timeSlot,
     });
     if (slotExists) {
@@ -198,7 +200,7 @@ export class InvigilationService {
 
     const slot = new this.slotModel({
       ...body,
-      date: new Date(body.date).toISOString().split('T')[0],
+      date: format(new Date(body.date), 'yyyy-MM-dd'),
       uniqueCode: randomCode,
     });
     return await slot.save();
