@@ -25,7 +25,10 @@ export class InvigilationService {
   ) {}
 
   async getSlots() {
-    return await this.slotModel.find().sort({ date: 1, timeSlot: -1 });
+    return await this.slotModel
+      .find()
+      .sort({ date: 1, timeSlot: -1 })
+      .populate('rooms', 'room_no -_id');
   }
 
   async getSlot(id: string) {

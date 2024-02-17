@@ -27,6 +27,18 @@ export class ExamControllerService {
   ) {}
 
   async create(createExamControllerDto: CreateExamControllerDto) {
+    const examControllerData = await this.examControllerModel.findOne({
+      username: createExamControllerDto.username,
+    });
+    if (examControllerData) {
+      throw new HttpException(
+        {
+          message: 'Username already exists',
+        },
+        400,
+      );
+    }
+
     const pass_hash = await bcrypt.hash(createExamControllerDto.password, 10);
     createExamControllerDto.password = pass_hash;
 
