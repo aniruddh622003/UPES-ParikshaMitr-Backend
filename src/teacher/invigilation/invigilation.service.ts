@@ -161,9 +161,9 @@ export class InvigilationService {
       }
     }
 
-    const res = { Answer_Sheets: ansSheetNos };
+    const res = [{ type: 'Answer Sheet', quantity: ansSheetNos }];
     for (const key in qPaperNos) {
-      res[key + ' Question Paper'] = qPaperNos[key];
+      res.push({ type: key + ' Question Paper', quantity: qPaperNos[key] });
     }
     return { message: 'Total Supplies Info', data: res };
   }
@@ -202,6 +202,19 @@ export class InvigilationService {
       throw new HttpException('Bad request', 400);
     }
     await roomInvigilator.save();
+
+    const pendingSupplies = new this.pendingSuppliesModel({
+      room_id: roomInvigilator.room_id,
+      pending_supplies: approveInvigilatorDto.pending_supplies.map((supply) => {
+        return {
+          suppl_type: supply.type,
+          quantity: supply.quantity,
+        };
+      }),
+    });
+
+    await pendingSupplies.save();
+
     return {
       message: 'Teacher Approval Collected',
     };

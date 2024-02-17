@@ -14,14 +14,15 @@ export class PendingSupplies {
   @Prop({
     type: [
       {
-        type: String,
+        suppl_type: String,
         quantity: Number,
       },
     ],
+    _id: false,
   })
   pending_supplies: [
     {
-      type: string;
+      suppl_type: string;
       quantity: number;
     },
   ];
