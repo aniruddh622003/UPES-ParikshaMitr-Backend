@@ -12,6 +12,10 @@ import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 import { format } from 'date-fns';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
 import { IssueBSheetDto } from '../dto/issueBsheet.dto';
+import {
+  PendingSupplies,
+  PendingSuppliesDocument,
+} from '../../schemas/pending-supplies.schema';
 
 @Injectable()
 export class InvigilationService {
@@ -20,6 +24,8 @@ export class InvigilationService {
     @InjectModel(RoomInvigilator.name)
     private roomInvigilatorModel: Model<RoomInvigilatorDocument>,
     @InjectModel(Slot.name) private slotModel: Model<Slot>,
+    @InjectModel(PendingSupplies.name)
+    private pendingSuppliesModel: Model<PendingSuppliesDocument>,
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
@@ -110,6 +116,56 @@ export class InvigilationService {
         invigilator1: roomInvigilator.invigilator1_id,
       },
     };
+  }
+
+  async getSupplies(teacher_id: string) {
+    const curr_date = format(new Date(), 'yyyy-MM-dd');
+    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
+
+    const curr_slot = await this.slotModel.findOne({
+      date: curr_date,
+      timeSlot: curr_time_slot,
+    });
+
+    if (!curr_slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    const AllRooms = curr_slot.rooms;
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: { $in: AllRooms },
+      $or: [
+        {
+          invigilator1_id: teacher_id,
+        },
+        {
+          invigilator2_id: teacher_id,
+        },
+      ],
+    });
+
+    if (!invigilator) {
+      throw new HttpException('Invigilator not assigned to any room', 404);
+    }
+
+    const room = await this.roomModel.findById(invigilator.room_id);
+
+    const qPaperNos = {};
+    const ansSheetNos = room.students.length;
+
+    for (let i = 0; i < room.students.length; i++) {
+      if (!qPaperNos[room.students[i].subject]) {
+        qPaperNos[room.students[i].subject] = 1;
+      } else {
+        qPaperNos[room.students[i].subject] += 1;
+      }
+    }
+
+    const res = { Answer_Sheets: ansSheetNos };
+    for (const key in qPaperNos) {
+      res[key + ' Question Paper'] = qPaperNos[key];
+    }
+    return { message: 'Total Supplies Info', data: res };
   }
 
   async approveInvigilator(

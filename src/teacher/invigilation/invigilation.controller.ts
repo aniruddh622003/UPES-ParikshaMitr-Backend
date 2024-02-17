@@ -32,6 +32,12 @@ export class InvigilationController {
   }
 
   @UseGuards(TeacherJwtGuard)
+  @Get('get-supplies')
+  getSupplies(@Req() req) {
+    return this.invigilationService.getSupplies(req?.user.id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
   @Post('approve-invigilator')
   approveInvigilator(
     @Body() approveInvigilatorDto: ApproveInvigilatorDto,
