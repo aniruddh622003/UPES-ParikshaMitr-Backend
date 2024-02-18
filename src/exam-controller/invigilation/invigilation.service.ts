@@ -27,12 +27,18 @@ export class InvigilationService {
   async getSlots() {
     return await this.slotModel
       .find()
-      .sort({ date: 1, timeSlot: -1 })
+      .sort({ date: -1, timeSlot: -1 })
       .populate('rooms', 'room_no -_id');
   }
 
   async getSlot(id: string) {
-    return (await this.slotModel.findById(id)).populate('rooms ufms');
+    return (
+      await (
+        await (await this.slotModel.findById(id)).populate('rooms ufms')
+      ).populate('rooms.room_invigilator_id')
+    ).populate(
+      'rooms.room_invigilator_id.invigilator1_id rooms.room_invigilator_id.invigilator2_id',
+    );
   }
 
   async createRoom(createRoomDto: CreateRoomDto) {
@@ -81,14 +87,28 @@ export class InvigilationService {
       .populate('invigilator1_id')
       .populate('invigilator2_id')
       .populate('room_id');
+
     const returnObj = roomswithPendingInvigilator.map((room) => {
       const temp = {};
-      temp['room'] = room.room_id;
+      temp['room_id'] = (room.room_id as any)._id;
+      temp['room_no'] = (room.room_id as any).room_no;
       if (room.invigilator1_id) {
-        temp['invigilator1'] = room.invigilator1_id;
+        temp['invigilator1'] = {
+          id: (room.invigilator1_id as any)._id,
+          sap_id: (room.invigilator1_id as any).sap_id,
+          name: (room.invigilator1_id as any).name,
+        };
+        temp['invigilator1_controller_approval'] =
+          room.invigilator1_controller_approval;
       }
       if (room.invigilator2_id) {
-        temp['invigilator2'] = room.invigilator2_id;
+        temp['invigilator2'] = {
+          id: (room.invigilator2_id as any)._id,
+          sap_id: (room.invigilator2_id as any).sap_id,
+          name: (room.invigilator2_id as any).name,
+        };
+        temp['invigilator2_controller_approval'] =
+          room.invigilator2_controller_approval;
       }
       return temp;
     });

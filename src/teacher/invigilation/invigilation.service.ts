@@ -109,11 +109,16 @@ export class InvigilationService {
     }
     await roomInvigilator.save();
 
+    const invigilator1 = {
+      sap_id: (roomInvigilator.invigilator1_id as any).sap_id,
+      name: (roomInvigilator.invigilator1_id as any).name,
+    };
+
     return {
       message: `Invigilator assigned`,
       data: {
         room: roomInvigilator.room_id,
-        invigilator1: roomInvigilator.invigilator1_id,
+        invigilator1,
       },
     };
   }
@@ -146,6 +151,10 @@ export class InvigilationService {
 
     if (!invigilator) {
       throw new HttpException('Invigilator not assigned to any room', 404);
+    }
+
+    if (invigilator.invigilator2_controller_approval === false) {
+      throw new HttpException('Invigilator not approved by controller', 400);
     }
 
     const room = await this.roomModel.findById(invigilator.room_id);
