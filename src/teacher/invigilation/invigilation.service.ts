@@ -171,7 +171,12 @@ export class InvigilationService {
     if (pending) {
       return {
         message: 'Pending Supplies Info',
-        data: pending.pending_supplies,
+        data: pending.pending_supplies.map((supply) => {
+          return {
+            type: supply.suppl_type,
+            quantity: supply.quantity,
+          };
+        }),
       };
     }
 
