@@ -16,6 +16,7 @@ import {
   PendingSupplies,
   PendingSuppliesDocument,
 } from '../../schemas/pending-supplies.schema';
+import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -263,6 +264,79 @@ export class InvigilationService {
 
     return {
       message: 'Teacher Approval Collected',
+    };
+  }
+
+  async updateSupplies(body: UpdateSuppliesDto, teacher_id: any) {
+    const curr_date = format(new Date(), 'yyyy-MM-dd');
+    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
+
+    const curr_slot = await this.slotModel.findOne({
+      date: curr_date,
+      timeSlot: curr_time_slot,
+    });
+
+    if (!curr_slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    const AllRooms = curr_slot.rooms;
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: { $in: AllRooms },
+      $or: [
+        {
+          invigilator1_id: teacher_id,
+        },
+        {
+          invigilator2_id: teacher_id,
+        },
+      ],
+    });
+
+    if (!invigilator) {
+      throw new HttpException('Invigilator not assigned to any room', 404);
+    }
+    if (invigilator.invigilator1_id?.toString() == teacher_id) {
+      if (invigilator.invigilator1_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
+
+    if (invigilator.invigilator2_id?.toString() == teacher_id) {
+      if (invigilator.invigilator2_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
+
+    const pending = await this.pendingSuppliesModel.findOne({
+      room_id: invigilator.room_id,
+    });
+    if (!pending) {
+      throw new HttpException('No Pending Supplies found', 400);
+    }
+
+    for (const supply of body.supplies) {
+      const idx = pending.pending_supplies.findIndex(
+        (p_supply) => p_supply.suppl_type === supply.type,
+      );
+      if (idx === -1) {
+        throw new HttpException('Invalid Supply Type', 400);
+      }
+      if (supply.quantity > pending.pending_supplies[idx].quantity) {
+        throw new HttpException('Invalid Quantity for ' + supply.type, 400);
+      }
+    }
+
+    pending.pending_supplies = body.supplies.map((supply) => {
+      return {
+        suppl_type: supply.type,
+        quantity: supply.quantity,
+      };
+    }) as any;
+    await pending.save();
+
+    return {
+      message: 'Supplies Updated',
     };
   }
 

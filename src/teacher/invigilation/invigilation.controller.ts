@@ -14,6 +14,7 @@ import { ApproveInvigilatorDto } from '../dto/approve-Invigilator.dto';
 import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 import { IssueBSheetDto } from '../dto/issueBsheet.dto';
+import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
@@ -47,6 +48,12 @@ export class InvigilationController {
       approveInvigilatorDto,
       req?.user.id,
     );
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Patch('update-supplies')
+  updateSupplies(@Body() body: UpdateSuppliesDto, @Req() req) {
+    return this.invigilationService.updateSupplies(body, req?.user.id);
   }
 
   @Get('seating-plan')
