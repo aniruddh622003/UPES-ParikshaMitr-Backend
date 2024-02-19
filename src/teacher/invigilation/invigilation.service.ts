@@ -152,9 +152,26 @@ export class InvigilationService {
     if (!invigilator) {
       throw new HttpException('Invigilator not assigned to any room', 404);
     }
+    if (invigilator.invigilator1_id.toString() == teacher_id) {
+      if (invigilator.invigilator1_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
 
-    if (invigilator.invigilator2_controller_approval === false) {
-      throw new HttpException('Invigilator not approved by controller', 400);
+    if (invigilator.invigilator2_id.toString() == teacher_id) {
+      if (invigilator.invigilator2_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
+
+    const pending = await this.pendingSuppliesModel.findOne({
+      room_id: invigilator.room_id,
+    });
+    if (pending) {
+      return {
+        message: 'Pending Supplies Info',
+        data: pending.pending_supplies,
+      };
     }
 
     const room = await this.roomModel.findById(invigilator.room_id);
