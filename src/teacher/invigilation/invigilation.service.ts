@@ -152,13 +152,13 @@ export class InvigilationService {
     if (!invigilator) {
       throw new HttpException('Invigilator not assigned to any room', 404);
     }
-    if (invigilator.invigilator1_id.toString() == teacher_id) {
+    if (invigilator.invigilator1_id?.toString() == teacher_id) {
       if (invigilator.invigilator1_controller_approval === false) {
         throw new HttpException('Invigilator not approved by controller', 400);
       }
     }
 
-    if (invigilator.invigilator2_id.toString() == teacher_id) {
+    if (invigilator.invigilator2_id?.toString() == teacher_id) {
       if (invigilator.invigilator2_controller_approval === false) {
         throw new HttpException('Invigilator not approved by controller', 400);
       }
@@ -208,7 +208,7 @@ export class InvigilationService {
     if (!roomInvigilator) {
       throw new HttpException('Room not found', 404);
     }
-    if (roomInvigilator.invigilator1_id.toString() === invigilatorId) {
+    if (roomInvigilator.invigilator1_id?.toString() === invigilatorId) {
       if (roomInvigilator.invigilator1_teacher_approval) {
         throw new HttpException('Invigilator already approved', 304);
       }
@@ -216,7 +216,7 @@ export class InvigilationService {
         throw new HttpException('Invigilator not approved by controller', 400);
       }
       roomInvigilator.invigilator1_teacher_approval = true;
-    } else if (roomInvigilator.invigilator2_id.toString() === invigilatorId) {
+    } else if (roomInvigilator.invigilator2_id?.toString() === invigilatorId) {
       if (roomInvigilator.invigilator2_teacher_approval) {
         throw new HttpException('Invigilator already approved', 304);
       }
