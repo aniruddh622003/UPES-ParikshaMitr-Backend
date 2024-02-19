@@ -33,6 +33,19 @@ export class TeacherService {
   ) {}
 
   async create(createTeacherDto: CreateTeacherDto) {
+    const teacher = await this.teacherModel.findOne({
+      sap_id: createTeacherDto.sap_id,
+    });
+
+    if (teacher) {
+      throw new HttpException(
+        {
+          message: 'Teacher already exists',
+        },
+        400,
+      );
+    }
+
     const pass_hash = await bcrypt.hash(createTeacherDto.password, 10);
     createTeacherDto.password = pass_hash;
 
