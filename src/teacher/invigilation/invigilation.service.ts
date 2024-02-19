@@ -229,6 +229,26 @@ export class InvigilationService {
     }
     await roomInvigilator.save();
 
+    const p_supplies = await this.pendingSuppliesModel.findOne({
+      room_id: roomInvigilator.room_id,
+    });
+
+    if (p_supplies) {
+      p_supplies.pending_supplies = approveInvigilatorDto.pending_supplies.map(
+        (supply) => {
+          return {
+            suppl_type: supply.type,
+            quantity: supply.quantity,
+          };
+        },
+      ) as any;
+      await p_supplies.save();
+
+      return {
+        message: 'Teacher Approval Collected',
+      };
+    }
+
     const pendingSupplies = new this.pendingSuppliesModel({
       room_id: roomInvigilator.room_id,
       pending_supplies: approveInvigilatorDto.pending_supplies.map((supply) => {
