@@ -315,7 +315,7 @@ export class InvigilationService {
       throw new HttpException('No Pending Supplies found', 400);
     }
 
-    for (const supply of body.supplies) {
+    for (const supply of body.pending_supplies) {
       const idx = pending.pending_supplies.findIndex(
         (p_supply) => p_supply.suppl_type === supply.type,
       );
@@ -327,7 +327,7 @@ export class InvigilationService {
       }
     }
 
-    pending.pending_supplies = body.supplies.map((supply) => {
+    pending.pending_supplies = body.pending_supplies.map((supply) => {
       return {
         suppl_type: supply.type,
         quantity: supply.quantity,

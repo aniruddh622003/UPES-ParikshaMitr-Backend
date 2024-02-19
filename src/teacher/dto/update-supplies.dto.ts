@@ -25,5 +25,5 @@ export class UpdateSuppliesDto {
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => Supply)
-  readonly supplies: Supply[];
+  readonly pending_supplies: Supply[];
 }
