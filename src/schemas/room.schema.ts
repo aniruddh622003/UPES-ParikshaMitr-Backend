@@ -25,6 +25,13 @@ export class Room {
   })
   room_invigilator_id: string | null;
 
+  @Prop({
+    type: String,
+    enum: ['INPROGRESS', 'COMPLETED', 'APPROVAL'],
+    default: 'INPROGRESS',
+  })
+  status: 'INPROGRESS' | 'COMPLETED' | 'APPROVAL';
+
   // TODO: Add UFM Details
   @Prop({
     default: [],
@@ -44,7 +51,7 @@ export class Room {
         },
         eligible: {
           type: String,
-          enum: ['YES', 'F_HOLD', 'DEBARRED'],
+          enum: ['YES', 'F_HOLD', 'DEBARRED', 'R_HOLD'],
           default: 'YES',
         },
         ans_sheet_number: {
@@ -92,7 +99,7 @@ export class Room {
       exam_type: string;
       eligible: {
         type: string;
-        enum: ['YES', 'F_HOLD', 'DEBARRED'];
+        enum: ['YES', 'F_HOLD', 'DEBARRED', 'R_HOLD'];
         default: 'YES';
       };
       ans_sheet_number?: number;

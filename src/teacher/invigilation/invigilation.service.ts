@@ -17,6 +17,7 @@ import {
   PendingSuppliesDocument,
 } from '../../schemas/pending-supplies.schema';
 import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
+import { SubmitControlletDto } from '../dto/submit.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -500,6 +501,91 @@ export class InvigilationService {
         seat_no: student.seat_no,
         b_sheet_count: student.b_sheet_count,
       },
+    };
+  }
+
+  async getStatus(id: any) {
+    const invigilator_id = id;
+    const curr_date = format(new Date(), 'yyyy-MM-dd');
+    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
+
+    const curr_slot = await this.slotModel.findOne({
+      date: curr_date,
+      timeSlot: curr_time_slot,
+    });
+
+    if (!curr_slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: { $in: curr_slot.rooms },
+      $or: [
+        {
+          invigilator1_id: invigilator_id,
+        },
+        {
+          invigilator2_id: invigilator_id,
+        },
+      ],
+    });
+
+    const room = await this.roomModel.findById(invigilator.room_id);
+
+    return {
+      message: 'Invigilation Status',
+      data: room.status,
+    };
+  }
+
+  async submitToController(id: any, body: SubmitControlletDto) {
+    const unique_code = body.unique_code;
+    const invigilator_id = id;
+
+    if (!invigilator_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
+    const slot = await this.slotModel.findOne({
+      uniqueCode: unique_code,
+    });
+
+    if (!slot) {
+      throw new HttpException('Invalid unique code', 400);
+    }
+
+    const allRooms = slot.rooms;
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: { $in: allRooms },
+      $or: [
+        {
+          invigilator1_id: invigilator_id,
+        },
+        {
+          invigilator2_id: invigilator_id,
+        },
+      ],
+    });
+
+    if (!invigilator) {
+      throw new HttpException('Invalid Room', 404);
+    }
+
+    const room = await this.roomModel.findById(invigilator.room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    if (room.status === 'APPROVAL') {
+      throw new HttpException('Already submitted to controller', 400);
+    }
+
+    room.status = 'APPROVAL';
+
+    await room.save();
+
+    return {
+      message: 'Submitted to Controller',
     };
   }
 }

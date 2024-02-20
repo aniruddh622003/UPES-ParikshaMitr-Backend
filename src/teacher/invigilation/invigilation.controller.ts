@@ -15,6 +15,7 @@ import { MarkAttendanceDto } from '../dto/mark-attendance.dto';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 import { IssueBSheetDto } from '../dto/issueBsheet.dto';
 import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
+import { SubmitControlletDto } from '../dto/submit.dto';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
@@ -80,5 +81,17 @@ export class InvigilationController {
     @Query('sap_id') sap_id: string,
   ) {
     return this.invigilationService.getBSheet(room_id, sap_id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('get-status')
+  getStatus(@Req() req) {
+    return this.invigilationService.getStatus(req?.user.id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Post('submit')
+  submitToController(@Req() req, @Body() body: SubmitControlletDto) {
+    return this.invigilationService.submitToController(req?.user.id, body);
   }
 }

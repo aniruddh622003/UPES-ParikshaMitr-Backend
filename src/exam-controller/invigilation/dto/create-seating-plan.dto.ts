@@ -28,8 +28,8 @@ class Student {
   @IsString()
   seat_no: string;
   @IsString()
-  @IsIn(['YES', 'F_HOLD', 'DEBARRED'])
-  eligible: 'YES' | 'F_HOLD' | 'DEBARRED';
+  @IsIn(['YES', 'F_HOLD', 'DEBARRED', 'R_HOLD'])
+  eligible: 'YES' | 'F_HOLD' | 'DEBARRED' | 'R_HOLD';
 }
 
 export class CreateSeatingPlanDto {
