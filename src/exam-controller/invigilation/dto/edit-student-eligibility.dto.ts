@@ -6,8 +6,8 @@ export class EditStudentEligibilityDto {
   room_id: string;
 
   @IsString()
-  @IsIn(['YES', 'F_HOLD', 'DEBARRED'])
-  eligible: 'YES' | 'F_HOLD' | 'DEBARRED';
+  @IsIn(['YES', 'F_HOLD', 'DEBARRED', 'R_HOLD'])
+  eligible: 'YES' | 'F_HOLD' | 'DEBARRED' | 'R_HOLD';
 
   @IsNumber()
   @IsNotEmpty()

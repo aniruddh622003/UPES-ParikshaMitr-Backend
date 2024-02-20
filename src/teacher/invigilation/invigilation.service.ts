@@ -362,7 +362,11 @@ export class InvigilationService {
     const F_HoldStudents = room.students.filter(
       (student) => (student.eligible as any) === 'F_HOLD',
     ).length;
-    const eligibleStudents = totalStudents - DebarredStudents - F_HoldStudents;
+    const r_holdStudents = room.students.filter(
+      (student) => (student.eligible as any) === 'R_HOLD',
+    ).length;
+    const eligibleStudents =
+      totalStudents - DebarredStudents - F_HoldStudents - r_holdStudents;
 
     return {
       message: 'Seating Plan',
@@ -372,6 +376,7 @@ export class InvigilationService {
         eligible_students: eligibleStudents,
         debarred_students: DebarredStudents,
         f_hold_students: F_HoldStudents,
+        r_hold_students: r_holdStudents,
         highest_seat_no: highestSeatNo,
         seating_plan: room.students,
       },
@@ -422,6 +427,9 @@ export class InvigilationService {
       }
       if (room.students[stuIdx].eligible === ('F_HOLD' as any)) {
         message += `Financial Hold`;
+      }
+      if (room.students[stuIdx].eligible === ('R_HOLD' as any)) {
+        message += `Registration Hold`;
       }
       throw new HttpException(message, 400);
     }
