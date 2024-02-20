@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { InvigilationService } from './invigilation.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -80,5 +81,17 @@ export class InvigilationController {
   @Patch('/room/edit-student-eligibility')
   editStudentEligibility(@Body() body: EditStudentEligibilityDto) {
     return this.invigilationService.editStudentEligibility(body);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Get('/room/total-supplies')
+  getTotalSupplies(@Query('room_id') room_id: string) {
+    return this.invigilationService.getTotalSupplies(room_id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Post('/room/approve-submission')
+  approveRoomSubmission(@Body('room_id') room_id: string) {
+    return this.invigilationService.approveRoomSubmission(room_id);
   }
 }

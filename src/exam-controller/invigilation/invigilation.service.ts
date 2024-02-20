@@ -243,4 +243,47 @@ export class InvigilationService {
         'Rooms added to slot, Date: ' + slot.date + ', Time: ' + slot.timeSlot,
     };
   }
+
+  async getTotalSupplies(room_id: string) {
+    const room = await this.roomModel.findById(room_id);
+
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const qPaperNos = {};
+    const ansSheetNos = room.students.length;
+
+    for (let i = 0; i < room.students.length; i++) {
+      if (!qPaperNos[room.students[i].subject]) {
+        qPaperNos[room.students[i].subject] = 1;
+      } else {
+        qPaperNos[room.students[i].subject] += 1;
+      }
+    }
+
+    const res = [{ type: 'Answer Sheet', quantity: ansSheetNos }];
+    for (const key in qPaperNos) {
+      res.push({ type: key + ' Question Paper', quantity: qPaperNos[key] });
+    }
+    return { message: 'Total Supplies Info', data: res };
+  }
+
+  async approveRoomSubmission(room_id: string) {
+    const room = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    if (room.status === 'COMPLETED') {
+      throw new HttpException('Room already approved', 400);
+    }
+
+    room.status = 'COMPLETED';
+    await room.save();
+
+    return {
+      message: 'Room submission approved',
+    };
+  }
 }
