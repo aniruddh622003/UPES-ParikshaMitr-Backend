@@ -85,8 +85,8 @@ export class InvigilationController {
 
   @UseGuards(TeacherJwtGuard)
   @Get('get-status')
-  getStatus(@Req() req) {
-    return this.invigilationService.getStatus(req?.user.id);
+  getStatus(@Query('room_id') room_id: string) {
+    return this.invigilationService.getStatus(room_id);
   }
 
   @UseGuards(TeacherJwtGuard)

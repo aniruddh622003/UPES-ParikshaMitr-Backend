@@ -504,33 +504,8 @@ export class InvigilationService {
     };
   }
 
-  async getStatus(id: any) {
-    const invigilator_id = id;
-    const curr_date = format(new Date(), 'yyyy-MM-dd');
-    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
-
-    const curr_slot = await this.slotModel.findOne({
-      date: curr_date,
-      timeSlot: curr_time_slot,
-    });
-
-    if (!curr_slot) {
-      throw new HttpException('Slot not found', 404);
-    }
-
-    const invigilator = await this.roomInvigilatorModel.findOne({
-      room_id: { $in: curr_slot.rooms },
-      $or: [
-        {
-          invigilator1_id: invigilator_id,
-        },
-        {
-          invigilator2_id: invigilator_id,
-        },
-      ],
-    });
-
-    const room = await this.roomModel.findById(invigilator.room_id);
+  async getStatus(room_id: string) {
+    const room = await this.roomModel.findById(room_id);
 
     return {
       message: 'Invigilation Status',
