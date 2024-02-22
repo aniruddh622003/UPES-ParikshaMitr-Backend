@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   Query,
+  Put,
 } from '@nestjs/common';
 import { InvigilationService } from './invigilation.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -18,6 +19,7 @@ import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 import { ExamContGuard } from '../../guards/cont-guard.guard';
+import { EditContactDto } from './dto/edit-contact.dto';
 
 @Controller('exam-controller/invigilation')
 export class InvigilationController {
@@ -93,5 +95,17 @@ export class InvigilationController {
   @Post('/room/approve-submission')
   approveRoomSubmission(@Body('room_id') room_id: string) {
     return this.invigilationService.approveRoomSubmission(room_id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Get('/contact-details')
+  getContactDetails(@Query('slot_id') slot_id: string) {
+    return this.invigilationService.getContactDetails(slot_id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Put('/contact-details')
+  updateContactDetails(@Body() body: EditContactDto) {
+    return this.invigilationService.updateContactDetails(body);
   }
 }

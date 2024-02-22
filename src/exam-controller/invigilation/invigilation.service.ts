@@ -14,6 +14,7 @@ import { CreateSlotDto } from './dto/create-slot.dto';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 import { format } from 'date-fns';
+import { EditContactDto } from './dto/edit-contact.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -284,6 +285,32 @@ export class InvigilationService {
 
     return {
       message: 'Room submission approved',
+    };
+  }
+
+  async getContactDetails(slot_id: string) {
+    const slot = await this.slotModel.findById(slot_id);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    return {
+      message: 'Contact details',
+      data: slot.contact,
+    };
+  }
+
+  async updateContactDetails(body: EditContactDto) {
+    const slot = await this.slotModel.findById(body.slot_id);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    slot.contact = body.contacts as any;
+    await slot.save();
+
+    return {
+      message: 'Contact details updated',
     };
   }
 }
