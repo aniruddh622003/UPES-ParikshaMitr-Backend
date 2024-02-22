@@ -588,4 +588,16 @@ export class InvigilationService {
       message: 'Submitted to Controller',
     };
   }
+
+  async getContactDetails(slot_id: string) {
+    const slot = await this.slotModel.findById(slot_id);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    return {
+      message: 'Contact Details',
+      data: slot.contact,
+    };
+  }
 }

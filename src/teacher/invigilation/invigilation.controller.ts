@@ -94,4 +94,10 @@ export class InvigilationController {
   submitToController(@Req() req, @Body() body: SubmitControlletDto) {
     return this.invigilationService.submitToController(req?.user.id, body);
   }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('contact-details')
+  getContactDetails(@Query('slot_id') slot_id: string) {
+    return this.invigilationService.getContactDetails(slot_id);
+  }
 }
