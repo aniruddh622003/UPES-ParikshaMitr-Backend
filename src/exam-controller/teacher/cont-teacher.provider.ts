@@ -5,12 +5,22 @@ import { Model } from 'mongoose';
 import { Schedule, ScheduleDocument } from '../../schemas/schedule.schema';
 import { AddEventDto } from '../dto/add-event.dto';
 import { AddTeacherToEventDto } from '../dto/add-teacher-to-event.dto';
+import { Slot, SlotDocument } from '../../schemas/slot.schema';
+import {
+  RoomInvigilator,
+  RoomInvigilatorDocument,
+} from '../../schemas/room-invigilator.schema';
+import { Room, RoomDocument } from '../../schemas/room.schema';
 
 @Injectable()
 export class ContTeacherService {
   constructor(
     @InjectModel(Teacher.name) private teacherModel: Model<TeacherDocument>,
     @InjectModel(Schedule.name) private scheduleModel: Model<ScheduleDocument>,
+    @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
+    @InjectModel(RoomInvigilator.name)
+    private roomInvigilatorModel: Model<RoomInvigilatorDocument>,
+    @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
   ) {}
 
   async findApproved() {
@@ -212,5 +222,107 @@ export class ContTeacherService {
         500,
       );
     }
+  }
+
+  async getSlotAttendance() {
+    const slots = await this.slotModel.find();
+    const allTeachers = await this.teacherModel.find({
+      approved: true,
+    });
+
+    const teacherAttendance = allTeachers.map((teacher) => {
+      return {
+        _id: teacher._id,
+        teacher: teacher.name,
+        attendance: [],
+      };
+    });
+
+    // Each slot has set of rooms, and each room is connected to a roomInvigilator which has invigilator1 and invigilator2
+    // We need to get the invigilator1 and invigilator2 and check if the teacher is present in the roomInvigilator
+    // If present, then the teacher is present in the slot
+    // slots.forEach((slot) => {
+    //   slot?.rooms?.forEach((room) => {
+
+    // This login in for loop so that it can be awaited
+
+    for (let i = 0; i < slots.length; i++) {
+      const slot = slots[i];
+      for (let j = 0; j < slot.rooms.length; j++) {
+        const room = slot.rooms[j];
+        const roomInvigilator = await this.roomInvigilatorModel.findOne({
+          room_id: room,
+        });
+        if (roomInvigilator) {
+          const teacher1 = roomInvigilator.invigilator1_id?.toString();
+          const teacher2 = roomInvigilator.invigilator2_id?.toString();
+          const teacher1Index = teacherAttendance.findIndex(
+            (teacher) => teacher._id.toString() == teacher1,
+          );
+          const teacher2Index = teacherAttendance.findIndex(
+            (teacher) => teacher._id.toString() == teacher2,
+          );
+          if (teacher1Index != -1) {
+            teacherAttendance[teacher1Index].attendance.push({
+              slot_date: slot.date,
+              slot_type: slot.timeSlot,
+              slot_id: slot._id,
+              attendance: true,
+            });
+          }
+          if (teacher2Index != -1) {
+            teacherAttendance[teacher2Index].attendance.push({
+              slot_date: slot.date,
+              slot_type: slot.timeSlot,
+              slot_id: slot._id,
+              attendance: true,
+            });
+          }
+        }
+      }
+    }
+
+    // For all teachers, if the teacher is not present in the slot, then add the slot to the attendance with attendance as false
+    teacherAttendance.forEach((teacher) => {
+      slots.forEach((slot) => {
+        const slotIndex = teacher.attendance.findIndex(
+          (attendance) => attendance.slot_id.toString() == slot._id.toString(),
+        );
+        if (slotIndex == -1) {
+          teacher.attendance.push({
+            slot_date: slot.date,
+            slot_type: slot.timeSlot,
+            slot_id: slot._id,
+            attendance: false,
+          });
+        }
+      });
+    });
+
+    // Give all slots data grouped by date and timeSlot in array, format:
+    // [{ date: { timeSlot: [slot1, slot2, ...] } }]
+
+    const allSlotsData = slots.reduce((acc, slot) => {
+      const d = acc.find((a) => a.date === slot.date);
+      if (d) {
+        const t = d.timeSlots.find((t) => t === slot.timeSlot);
+        if (!t) {
+          d.timeSlots.push(slot.timeSlot);
+        }
+      } else {
+        acc.push({
+          date: slot.date,
+          timeSlots: [slot.timeSlot],
+        });
+      }
+      return acc;
+    }, []);
+    return {
+      message: 'Teacher attendance fetched successfully',
+      data: {
+        teacherAttendance,
+        allSlotsData,
+      },
+    };
   }
 }

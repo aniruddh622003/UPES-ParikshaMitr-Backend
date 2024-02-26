@@ -551,6 +551,10 @@ export class InvigilationService {
       throw new HttpException('Room not found', 404);
     }
 
+    if (room.status === 'COMPLETED') {
+      throw new HttpException('Already submitted to controller', 202);
+    }
+
     if (room.status === 'APPROVAL') {
       throw new HttpException('Already submitted to controller', 400);
     }

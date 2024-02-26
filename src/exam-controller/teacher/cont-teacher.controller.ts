@@ -65,4 +65,10 @@ export class ContTeacherController {
   addTeacherToEvent(@Body() body: AddTeacherToEventDto) {
     return this.contTeacherService.addTeacherToEvent(body);
   }
+
+  @UseGuards(ExamContGuard)
+  @Get('slot-attendance')
+  getSlotAttendance() {
+    return this.contTeacherService.getSlotAttendance();
+  }
 }
