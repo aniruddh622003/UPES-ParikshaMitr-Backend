@@ -44,7 +44,7 @@ export class InvigilationService {
         await (await this.slotModel.findById(id)).populate('rooms ufms')
       ).populate('rooms.room_invigilator_id')
     ).populate(
-      'rooms.room_invigilator_id.invigilator1_id rooms.room_invigilator_id.invigilator2_id',
+      'rooms.room_invigilator_id.invigilator1_id rooms.room_invigilator_id.invigilator2_id rooms.room_invigilator_id.invigilator3_id',
     );
 
     // If room has pending supply, change status to "PENDING_SUPPLIES"
@@ -353,5 +353,13 @@ export class InvigilationService {
       throw new HttpException('Supplies not found', 404);
     }
     return supplies;
+  }
+
+  async getStudentList(room_id: string) {
+    const room = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+    return room.students;
   }
 }

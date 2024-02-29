@@ -114,4 +114,10 @@ export class InvigilationController {
   getSupplies(@Query('room_id') room_id: string) {
     return this.invigilationService.getSupplies(room_id);
   }
+
+  @UseGuards(ExamContGuard)
+  @Get('/room/student-list')
+  getStudentList(@Query('room_id') room_id: string) {
+    return this.invigilationService.getStudentList(room_id);
+  }
 }
