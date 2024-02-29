@@ -65,6 +65,16 @@ export class TeacherService {
     const teacherData = await this.teacherModel.findOne({
       sap_id: teacher.sap_id,
     });
+
+    if (!teacherData.approved) {
+      throw new HttpException(
+        {
+          message: 'Teacher not approved',
+        },
+        401,
+      );
+    }
+
     if (teacherData) {
       const match = await bcrypt.compare(
         teacher.password,

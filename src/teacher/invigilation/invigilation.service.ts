@@ -313,9 +313,31 @@ export class InvigilationService {
       throw new HttpException('Room not found', 404);
     }
 
-    const highestSeatNo = room.students.reduce((prev, curr) => {
-      return prev.seat_no > curr.seat_no ? prev : curr;
-    }).seat_no;
+    // Seat number is a A1, B10, etc.
+    // First letter is the row and the rest is the seat number
+    // So final output will be the the highest letter and the highest number
+    const highestSeatNo = room.students.reduce((acc, student) => {
+      const accRow = acc[0];
+      const accNum = parseInt(acc.slice(1));
+      const stuRow = student.seat_no.charAt(0);
+      const stuNum = parseInt(student.seat_no.slice(1));
+
+      let final;
+
+      if (stuRow > accRow) {
+        final = stuRow;
+      } else {
+        final = accRow;
+      }
+
+      if (stuNum > accNum) {
+        final += stuNum;
+      } else {
+        final += accNum;
+      }
+
+      return final;
+    }, 'A1');
 
     const totalStudents = room.students.length;
     const DebarredStudents = room.students.filter(
