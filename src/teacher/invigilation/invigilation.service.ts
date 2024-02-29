@@ -467,6 +467,9 @@ export class InvigilationService {
 
   async getStatus(room_id: string) {
     const room = await this.roomModel.findById(room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
 
     return {
       message: 'Invigilation Status',

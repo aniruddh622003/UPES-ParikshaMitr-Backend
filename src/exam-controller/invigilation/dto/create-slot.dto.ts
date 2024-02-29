@@ -11,7 +11,7 @@ export class CreateSlotDto {
   date: Date;
 
   @IsString()
-  @IsIn(['Morning', 'Evening'])
+  @IsIn(['Morning', 'Evening', 'Afternoon'])
   timeSlot: string;
 
   @IsString()

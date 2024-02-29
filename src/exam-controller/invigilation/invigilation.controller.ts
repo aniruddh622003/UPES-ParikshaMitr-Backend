@@ -108,4 +108,10 @@ export class InvigilationController {
   updateContactDetails(@Body() body: EditContactDto) {
     return this.invigilationService.updateContactDetails(body);
   }
+
+  @UseGuards(ExamContGuard)
+  @Get('/room/supplies')
+  getSupplies(@Query('room_id') room_id: string) {
+    return this.invigilationService.getSupplies(room_id);
+  }
 }

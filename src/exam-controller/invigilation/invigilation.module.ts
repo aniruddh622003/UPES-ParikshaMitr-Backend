@@ -9,6 +9,10 @@ import {
 } from '../../schemas/room-invigilator.schema';
 import { Slot, SlotSchema } from '../../schemas/slot.schema';
 import { JwtModule } from '@nestjs/jwt';
+import {
+  PendingSupplies,
+  PendingSuppliesSchema,
+} from '../../schemas/pending-supplies.schema';
 
 @Module({
   imports: [
@@ -16,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
       { name: Room.name, schema: RoomSchema },
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
       { name: Slot.name, schema: SlotSchema },
+      { name: PendingSupplies.name, schema: PendingSuppliesSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

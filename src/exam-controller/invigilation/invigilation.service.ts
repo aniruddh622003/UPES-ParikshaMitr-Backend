@@ -15,6 +15,10 @@ import { Slot, SlotDocument } from '../../schemas/slot.schema';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 import { format } from 'date-fns';
 import { EditContactDto } from './dto/edit-contact.dto';
+import {
+  PendingSupplies,
+  PendingSuppliesDocument,
+} from '../../schemas/pending-supplies.schema';
 
 @Injectable()
 export class InvigilationService {
@@ -23,6 +27,8 @@ export class InvigilationService {
     @InjectModel(RoomInvigilator.name)
     private roomInvigilatorModel: Model<RoomInvigilatorDocument>,
     @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
+    @InjectModel(PendingSupplies.name)
+    private pendingSuppliesModel: Model<PendingSuppliesDocument>,
   ) {}
 
   async getSlots() {
@@ -33,13 +39,34 @@ export class InvigilationService {
   }
 
   async getSlot(id: string) {
-    return (
+    const slot = await (
       await (
         await (await this.slotModel.findById(id)).populate('rooms ufms')
       ).populate('rooms.room_invigilator_id')
     ).populate(
       'rooms.room_invigilator_id.invigilator1_id rooms.room_invigilator_id.invigilator2_id',
     );
+
+    // If room has pending supply, change status to "PENDING_SUPPLIES"
+    for (const room of slot.rooms) {
+      const pendingSupplies = await this.pendingSuppliesModel.findOne({
+        room_id: (room as any)._id,
+      });
+
+      if (!pendingSupplies) {
+        continue;
+      }
+
+      const pending = pendingSupplies.pending_supplies.findIndex(
+        (suppl) => suppl.quantity > 0,
+      );
+
+      if (pending !== -1) {
+        (room as any).status = 'PENDING_SUPPLIES';
+      }
+    }
+
+    return slot;
   }
 
   async createRoom(createRoomDto: CreateRoomDto) {
@@ -316,5 +343,15 @@ export class InvigilationService {
     return {
       message: 'Contact details updated',
     };
+  }
+
+  async getSupplies(room_id: string) {
+    const supplies = await this.pendingSuppliesModel.findOne({
+      room_id,
+    });
+    if (!supplies) {
+      throw new HttpException('Supplies not found', 404);
+    }
+    return supplies;
   }
 }
