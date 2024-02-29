@@ -59,32 +59,36 @@ export class InvigilationService {
       throw new HttpException('Invigilator already assigned', 400);
     }
 
-    // Find all empty invigilation rooms
-    const AllEmptyRoomsInvigilators = await this.roomInvigilatorModel
+    let emptyRooms;
+
+    const roomsWithEmptyInvigilator1 = await this.roomInvigilatorModel
       .find({
         room_id: { $in: AllRooms },
-        $or: [
-          {
-            invigilator1_id: null,
-          },
-          {
-            invigilator2_id: null,
-          },
-        ],
+        invigilator1_id: null,
       })
       .select('_id');
 
-    // If no empty rooms, throw error
-    if (AllEmptyRoomsInvigilators.length === 0) {
-      throw new HttpException('No empty rooms', 400);
+    if (roomsWithEmptyInvigilator1.length > 0) {
+      emptyRooms = roomsWithEmptyInvigilator1;
+    } else {
+      const roomsWithEmptyInvigilator2 = await this.roomInvigilatorModel
+        .find({
+          room_id: { $in: AllRooms },
+          invigilator2_id: null,
+        })
+        .select('_id');
+
+      if (roomsWithEmptyInvigilator2.length > 0) {
+        emptyRooms = roomsWithEmptyInvigilator2;
+      } else {
+        throw new HttpException('No Empty Rooms found', 404);
+      }
     }
 
     // Assign invigilator to a random empty room
-    const randomAssignment = Math.floor(
-      Math.random() * AllEmptyRoomsInvigilators.length,
-    );
+    const randomAssignment = Math.floor(Math.random() * emptyRooms.length);
     const roomInvigilator = await this.roomInvigilatorModel
-      .findById(AllEmptyRoomsInvigilators[randomAssignment]._id)
+      .findById(emptyRooms[randomAssignment]._id)
       .populate('room_id')
       .populate('invigilator1_id');
 

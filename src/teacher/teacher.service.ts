@@ -65,6 +65,14 @@ export class TeacherService {
     const teacherData = await this.teacherModel.findOne({
       sap_id: teacher.sap_id,
     });
+    if (!teacherData) {
+      throw new HttpException(
+        {
+          message: 'Teacher not found',
+        },
+        404,
+      );
+    }
 
     if (!teacherData.approved) {
       throw new HttpException(
