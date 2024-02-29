@@ -44,6 +44,7 @@ export class InvigilationService {
 
     // Check if invigilator is already assigned
     const AllRooms = curr_slot.rooms;
+
     const checkInvigilator = await this.roomInvigilatorModel.findOne({
       room_id: { $in: AllRooms },
       $or: [
@@ -59,7 +60,7 @@ export class InvigilationService {
       throw new HttpException('Invigilator already assigned', 400);
     }
 
-    let emptyRooms;
+    let emptyRooms = [];
 
     const roomsWithEmptyInvigilator1 = await this.roomInvigilatorModel
       .find({
@@ -85,6 +86,25 @@ export class InvigilationService {
       }
     }
 
+    if (emptyRooms.length === 0) {
+      // Find rooms in slot with more than 70 students
+      const rooms = await this.roomModel.find({
+        _id: { $in: AllRooms },
+        'students.67': { $exists: true },
+      });
+
+      const roomInvigilators = await this.roomInvigilatorModel.find({
+        room_id: { $in: rooms.map((room) => room._id) },
+        invigilator3_id: null,
+      });
+
+      if (roomInvigilators.length === 0) {
+        throw new HttpException('No Empty Rooms found', 404);
+      }
+
+      emptyRooms = roomInvigilators;
+    }
+
     // Assign invigilator to a random empty room
     const randomAssignment = Math.floor(Math.random() * emptyRooms.length);
     const roomInvigilator = await this.roomInvigilatorModel
@@ -106,12 +126,17 @@ export class InvigilationService {
       sap_id: (roomInvigilator.invigilator1_id as any).sap_id,
       name: (roomInvigilator.invigilator1_id as any).name,
     };
+    const invigilator2 = {
+      sap_id: (roomInvigilator.invigilator2_id as any)?.sap_id,
+      name: (roomInvigilator.invigilator2_id as any)?.name,
+    };
 
     return {
       message: `Invigilator assigned`,
       data: {
         room: roomInvigilator.room_id,
         invigilator1,
+        invigilator2,
       },
     };
   }
@@ -542,11 +567,15 @@ export class InvigilationService {
     }
 
     if (room.status === 'COMPLETED') {
-      throw new HttpException('Already submitted to controller', 202);
+      return {
+        message: 'Submitted to Controller',
+      };
     }
 
     if (room.status === 'APPROVAL') {
-      throw new HttpException('Already submitted to controller', 400);
+      return {
+        message: 'Submitted to Controller',
+      };
     }
 
     room.status = 'APPROVAL';

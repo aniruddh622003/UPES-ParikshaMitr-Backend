@@ -69,6 +69,35 @@ export class RoomInvigilator {
     default: null,
   })
   invigilator2_controller_approved_by: string | null;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
+    default: null,
+  })
+  invigilator3_id: string | null;
+
+  @Prop({
+    default: null,
+  })
+  invigilator3_assign_time: Date | null;
+
+  @Prop({
+    default: false,
+  })
+  invigilator3_teacher_approval: boolean;
+
+  @Prop({
+    default: false,
+  })
+  invigilator3_controller_approval: boolean;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ExamController',
+    default: null,
+  })
+  invigilator3_controller_approved_by: string | null;
 }
 
 export const RoomInvigilatorSchema =
