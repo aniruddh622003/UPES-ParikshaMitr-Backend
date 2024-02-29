@@ -57,7 +57,13 @@ export class InvigilationService {
       ],
     });
     if (checkInvigilator) {
-      throw new HttpException('Invigilator already assigned', 400);
+      return {
+        message: `Invigilator assigned`,
+        data: {
+          room: checkInvigilator.room_id,
+          invigilator1: {},
+        },
+      };
     }
 
     let emptyRooms = [];
@@ -567,9 +573,7 @@ export class InvigilationService {
     }
 
     if (room.status === 'COMPLETED') {
-      return {
-        message: 'Submitted to Controller',
-      };
+      throw new HttpException('Already submitted to controller', 202);
     }
 
     if (room.status === 'APPROVAL') {

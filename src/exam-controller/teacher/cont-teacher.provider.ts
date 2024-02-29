@@ -325,4 +325,45 @@ export class ContTeacherService {
       },
     };
   }
+
+  async deleteTeacher(id: string) {
+    try {
+      const teacher = await this.teacherModel.findById(id);
+      if (!teacher) {
+        throw new HttpException(
+          {
+            message: 'Teacher not found',
+          },
+          404,
+        );
+      }
+      if (teacher.approved) {
+        throw new HttpException(
+          {
+            message: 'Approved teachers cannot be deleted',
+          },
+          400,
+        );
+      }
+      await teacher.deleteOne();
+      return {
+        message: 'Teacher deleted successfully',
+      };
+    } catch (err) {
+      if (err.name === 'CastError') {
+        throw new HttpException(
+          {
+            message: 'Invalid id',
+          },
+          400,
+        );
+      }
+      throw new HttpException(
+        {
+          message: 'Something went wrong',
+        },
+        500,
+      );
+    }
+  }
 }

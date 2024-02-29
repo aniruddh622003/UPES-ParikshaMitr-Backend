@@ -43,6 +43,12 @@ export class ContTeacherController {
   }
 
   @UseGuards(ExamContGuard)
+  @Delete('/delete/:id')
+  deleteTeacher(@Param('id') id: string) {
+    return this.contTeacherService.deleteTeacher(id);
+  }
+
+  @UseGuards(ExamContGuard)
   @Put('/edit/:id')
   editTeacher(@Param('id') id: string, @Body() body: any) {
     return this.contTeacherService.editTeacher(id, body);
