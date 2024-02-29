@@ -38,22 +38,9 @@ export class InvigilationService {
       throw new HttpException('Unauthorized', 401);
     }
 
-    const curr_date = format(new Date(), 'yyyy-MM-dd');
-    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
-
     const curr_slot = await this.slotModel.findOne({
-      date: curr_date,
-      timeSlot: curr_time_slot,
+      uniqueCode: unique_code,
     });
-
-    if (!curr_slot) {
-      throw new HttpException('Slot not found', 404);
-    }
-
-    // Unique code is used to prevent unauthorized access
-    if (unique_code !== curr_slot.uniqueCode) {
-      throw new HttpException('Invalid unique code', 400);
-    }
 
     // Check if invigilator is already assigned
     const AllRooms = curr_slot.rooms;
@@ -125,22 +112,9 @@ export class InvigilationService {
     };
   }
 
-  async getSupplies(teacher_id: string) {
-    const curr_date = format(new Date(), 'yyyy-MM-dd');
-    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
-
-    const curr_slot = await this.slotModel.findOne({
-      date: curr_date,
-      timeSlot: curr_time_slot,
-    });
-
-    if (!curr_slot) {
-      throw new HttpException('Slot not found', 404);
-    }
-
-    const AllRooms = curr_slot.rooms;
+  async getSupplies(teacher_id: string, room_id: string) {
     const invigilator = await this.roomInvigilatorModel.findOne({
-      room_id: { $in: AllRooms },
+      room_id: room_id,
       $or: [
         {
           invigilator1_id: teacher_id,
@@ -152,7 +126,7 @@ export class InvigilationService {
     });
 
     if (!invigilator) {
-      throw new HttpException('Invigilator not assigned to any room', 404);
+      throw new HttpException('Invigilator not assigned to this room', 404);
     }
     if (invigilator.invigilator1_id?.toString() == teacher_id) {
       if (invigilator.invigilator1_controller_approval === false) {
@@ -274,21 +248,8 @@ export class InvigilationService {
   }
 
   async updateSupplies(body: UpdateSuppliesDto, teacher_id: any) {
-    const curr_date = format(new Date(), 'yyyy-MM-dd');
-    const curr_time_slot = new Date().getHours() < 12 ? 'Morning' : 'Evening';
-
-    const curr_slot = await this.slotModel.findOne({
-      date: curr_date,
-      timeSlot: curr_time_slot,
-    });
-
-    if (!curr_slot) {
-      throw new HttpException('Slot not found', 404);
-    }
-
-    const AllRooms = curr_slot.rooms;
     const invigilator = await this.roomInvigilatorModel.findOne({
-      room_id: { $in: AllRooms },
+      room_id: body.room_id,
       $or: [
         {
           invigilator1_id: teacher_id,
@@ -300,7 +261,7 @@ export class InvigilationService {
     });
 
     if (!invigilator) {
-      throw new HttpException('Invigilator not assigned to any room', 404);
+      throw new HttpException('Invigilator not assigned to this room', 404);
     }
     if (invigilator.invigilator1_id?.toString() == teacher_id) {
       if (invigilator.invigilator1_controller_approval === false) {

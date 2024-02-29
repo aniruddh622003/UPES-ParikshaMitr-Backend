@@ -10,8 +10,15 @@ export class Slot {
   @Prop({ required: true })
   date: string;
 
-  @Prop({ required: true, type: String, enum: ['Morning', 'Evening'] })
+  @Prop({
+    required: true,
+    type: String,
+    enum: ['Morning', 'Evening', 'Afternoon'],
+  })
   timeSlot: string;
+
+  @Prop({ required: true, type: String, enum: ['Midsem', 'Endsem'] })
+  type: string;
 
   @Prop({ required: true })
   uniqueCode: string;

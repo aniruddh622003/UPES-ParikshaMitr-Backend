@@ -20,6 +20,9 @@ class Supply {
 }
 
 export class UpdateSuppliesDto {
+  @IsString()
+  readonly room_id: string;
+
   @IsDefined()
   @IsArray()
   @ArrayNotEmpty()

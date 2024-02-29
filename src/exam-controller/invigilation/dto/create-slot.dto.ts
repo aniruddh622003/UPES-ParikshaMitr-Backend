@@ -14,6 +14,10 @@ export class CreateSlotDto {
   @IsIn(['Morning', 'Evening'])
   timeSlot: string;
 
+  @IsString()
+  @IsIn(['Midsem', 'Endsem'])
+  type: string;
+
   @IsDefined()
   @IsArray()
   rooms: string[];

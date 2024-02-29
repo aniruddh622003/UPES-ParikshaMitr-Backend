@@ -35,8 +35,8 @@ export class InvigilationController {
 
   @UseGuards(TeacherJwtGuard)
   @Get('get-supplies')
-  getSupplies(@Req() req) {
-    return this.invigilationService.getSupplies(req?.user.id);
+  getSupplies(@Req() req, @Query('room_id') room_id: string) {
+    return this.invigilationService.getSupplies(req?.user.id, room_id);
   }
 
   @UseGuards(TeacherJwtGuard)

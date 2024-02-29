@@ -222,6 +222,10 @@ export class InvigilationService {
     // Random alphanumeric code 10 characters long
     const randomCode = Math.random().toString(36).substr(2, 10);
 
+    if (body.type === 'Endsem' && body.timeSlot === 'Afternoon') {
+      throw new HttpException('Invalid Slot TimeSlot', 400);
+    }
+
     const slot = new this.slotModel({
       ...body,
       date: format(new Date(body.date), 'yyyy-MM-dd'),
