@@ -45,17 +45,19 @@ export class InvigilationService {
     // Check if invigilator is already assigned
     const AllRooms = curr_slot.rooms;
 
-    const checkInvigilator = await this.roomInvigilatorModel.findOne({
-      room_id: { $in: AllRooms },
-      $or: [
-        {
-          invigilator1_id: invigilator_id,
-        },
-        {
-          invigilator2_id: invigilator_id,
-        },
-      ],
-    });
+    const checkInvigilator = await this.roomInvigilatorModel
+      .findOne({
+        room_id: { $in: AllRooms },
+        $or: [
+          {
+            invigilator1_id: invigilator_id,
+          },
+          {
+            invigilator2_id: invigilator_id,
+          },
+        ],
+      })
+      .populate('room_id');
     if (checkInvigilator) {
       return {
         message: `Invigilator assigned`,
