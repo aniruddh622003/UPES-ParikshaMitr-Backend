@@ -50,6 +50,11 @@ export class InvigilationController {
   }
 
   @UseGuards(ExamContGuard)
+  @Delete('/slot/delete/:id')
+  deleteSlot(@Param('id') id: string) {
+    return this.invigilationService.deleteSlot(id);
+  }
+  @UseGuards(ExamContGuard)
   @Post('/room')
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.invigilationService.createRoom(createRoomDto);

@@ -45,6 +45,9 @@ export class Slot {
       phone: string;
     },
   ];
+
+  @Prop({ default: true })
+  isDeletable: boolean;
 }
 
 export const SlotSchema = SchemaFactory.createForClass(Slot);
