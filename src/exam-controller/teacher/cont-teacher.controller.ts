@@ -13,6 +13,7 @@ import { ContTeacherService } from './cont-teacher.provider';
 import { AddEventDto } from '../dto/add-event.dto';
 import { AddTeacherToEventDto } from '../dto/add-teacher-to-event.dto';
 import { ExamContGuard } from '../../guards/cont-guard.guard';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 
 @Controller('exam-controller/teacher')
 export class ContTeacherController {
@@ -76,5 +77,11 @@ export class ContTeacherController {
   @Get('slot-attendance')
   getSlotAttendance() {
     return this.contTeacherService.getSlotAttendance();
+  }
+
+  @UseGuards(ExamContGuard)
+  @Post('change-password')
+  changePassword(@Body() body: ChangePasswordDto) {
+    return this.contTeacherService.changePassword(body);
   }
 }

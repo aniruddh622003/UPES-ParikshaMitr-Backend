@@ -1,4 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
 import { Model } from 'mongoose';
@@ -11,6 +12,7 @@ import {
   RoomInvigilatorDocument,
 } from '../../schemas/room-invigilator.schema';
 import { Room, RoomDocument } from '../../schemas/room.schema';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 
 @Injectable()
 export class ContTeacherService {
@@ -365,5 +367,24 @@ export class ContTeacherService {
         500,
       );
     }
+  }
+
+  async changePassword(body: ChangePasswordDto) {
+    const teacher = await this.teacherModel.findById(body.teacher_id);
+    if (!teacher) {
+      throw new HttpException(
+        {
+          message: 'Teacher not found',
+        },
+        404,
+      );
+    }
+
+    const pass_hash = await bcrypt.hash(body.pass, 10);
+    teacher.password = pass_hash;
+    await teacher.save();
+    return {
+      message: 'Password changed successfully',
+    };
   }
 }
