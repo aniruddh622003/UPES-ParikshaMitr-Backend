@@ -362,4 +362,25 @@ export class InvigilationService {
     }
     return room.students;
   }
+
+  async deleteSlot(slot_id: string) {
+    const slot = await this.slotModel.findById(slot_id);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    if (!slot.isDeletable) {
+      throw new HttpException('Slot is not deletable', 400);
+    }
+
+    const rooms = slot.rooms;
+    await this.pendingSuppliesModel.deleteMany({ room_id: { $in: rooms } });
+    await this.roomInvigilatorModel.deleteMany({ room_id: { $in: rooms } });
+    await this.roomModel.deleteMany({ _id: { $in: rooms } });
+
+    await slot.deleteOne();
+    return {
+      message: 'Slot deleted',
+    };
+  }
 }
