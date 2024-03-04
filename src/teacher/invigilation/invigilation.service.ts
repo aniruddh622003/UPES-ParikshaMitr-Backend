@@ -42,6 +42,11 @@ export class InvigilationService {
       uniqueCode: unique_code,
     });
 
+    if (curr_slot.isDeletable) {
+      curr_slot.isDeletable = false;
+      await curr_slot.save();
+    }
+
     // Check if invigilator is already assigned
     const AllRooms = curr_slot.rooms;
 
