@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  HttpException,
 } from '@nestjs/common';
 import { ExamControllerService } from './exam-controller.service';
 import { CreateExamControllerDto } from './dto/create-exam-controller.dto';
@@ -23,6 +24,18 @@ export class ExamControllerController {
   @Post()
   create(@Body() createExamControllerDto: CreateExamControllerDto) {
     return this.examControllerService.create(createExamControllerDto);
+  }
+
+  @Get('get-student/:answerSheetId')
+  async getStudentDetailsByAnswerSheetId(@Param('answerSheetId') answerSheetId: string) {
+    const student = await this.examControllerService.getStudentDetailsByAnswerSheetId(answerSheetId);
+    if (!student) {
+      throw new HttpException(
+        { message: 'Student not found for provided answer sheet ID' },
+        404,
+      );
+    }
+    return student;
   }
 
   @Post('login')

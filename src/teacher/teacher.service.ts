@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { TeacherLoginDto } from './dto/teacher-login';
 import { JwtService } from '@nestjs/jwt';
 import { Schedule } from '../schemas/schedule.schema';
+import { Student } from '../schemas/student.schema';
 import {
   add,
   differenceInCalendarDays,
@@ -27,6 +28,7 @@ export class TeacherService {
   constructor(
     @InjectModel(Teacher.name) private teacherModel: Model<Teacher>,
     @InjectModel(Schedule.name) private scheduleModel: Model<Schedule>,
+    @InjectModel(Student.name) private studentModel: Model<Student>,
     @InjectModel(Notification.name)
     private notificationModel: Model<Notification>,
     private jwtService: JwtService,
@@ -113,6 +115,33 @@ export class TeacherService {
           message: 'Teacher not found',
         },
         404,
+      );
+    }
+  }
+
+
+  async getStudentDetailsByAnswerSheetId(answerSheetId: string) {
+    try {
+      const student = await this.studentModel.findOne({ answerSheetId }).exec();
+      if (!student) {
+        throw new HttpException(
+          { message: 'Student not found for provided answer sheet ID' },
+          404,
+        );
+      }
+      return {
+        message: 'Student details found',
+        data: {
+          name: student.name,
+          sapId: student.sap_id,
+          sheetId: student.sheet_id,
+          courseName: student.course_name,
+        },
+      };
+    } catch (err) {
+      throw new HttpException(
+        { message: 'Error retrieving student details' },
+        500,
       );
     }
   }

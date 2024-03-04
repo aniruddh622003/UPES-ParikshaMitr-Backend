@@ -44,6 +44,11 @@ export class TeacherController {
   getDetails(@Req() req) {
     return this.teacherService.findOne(req?.user?.id);
   }
+  @UseGuards(TeacherJwtGuard)
+  @Get('students/:answerSheetId')
+  getStudentDetailsByAnswerSheetId(@Param('answerSheetId') answerSheetId: string) {
+    return this.teacherService.getStudentDetailsByAnswerSheetId(answerSheetId);
+  }
 
   @UseGuards(TeacherJwtGuard)
   @Get('getSchedule')

@@ -1,10 +1,12 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CreateExamControllerDto } from './dto/create-exam-controller.dto';
 import { UpdateExamControllerDto } from './dto/update-exam-controller.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
+import { Student, StudentDocument } from '../schemas/student.schema';
 import {
   ExamController,
   ExamControllerDocument,
@@ -21,6 +23,7 @@ export class ExamControllerService {
   constructor(
     @InjectModel(ExamController.name)
     private examControllerModel: Model<ExamControllerDocument>,
+    @InjectModel(Student.name) private studentModel: Model<StudentDocument>,
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
     private jwtService: JwtService,
@@ -52,6 +55,30 @@ export class ExamControllerService {
         name: createdController.name,
       },
     };
+  }
+
+  async getStudentDetailsByAnswerSheetId(answerSheetId: string) {
+    try {
+      const student = await this.studentModel.findOne({ sheet_id:answerSheetId }).exec();
+      if (!student) {
+        throw new HttpException(
+          { message: 'Student not found for provided answer sheet ID' },
+          404,
+        );
+      }
+      return {
+        message: 'Student details found',
+        data: {
+          id: student.id,
+          name: student.name,
+          sap_id: student.sap_id,
+          sheet_id: student.sheet_id,
+          course_name: student.course_name,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(`Error retrieving student details: ${error.message}`, 500);
+    }
   }
 
   async login(examController: LoginExamControllerDto) {
