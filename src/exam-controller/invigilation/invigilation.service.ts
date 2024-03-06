@@ -143,6 +143,56 @@ export class InvigilationService {
     return returnObj;
   }
 
+  async rejectInvigilator(
+    approveInvigilatorDto: ApproveInvigilatorDto,
+    controllerId: string,
+  ) {
+    const room = await this.roomModel.findById(approveInvigilatorDto.roomId);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const roomInvigilator = await this.roomInvigilatorModel.findById(
+      room.room_invigilator_id,
+    );
+
+    let rejectedInvigilator;
+
+    if (
+      roomInvigilator.invigilator1_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      await roomInvigilator.populate('invigilator1_id', 'sap_id name');
+      rejectedInvigilator = roomInvigilator.invigilator1_id;
+
+      roomInvigilator.invigilator1_controller_approval = false;
+      roomInvigilator.invigilator1_controller_approved_by = null;
+      roomInvigilator.invigilator1_id = null;
+      roomInvigilator.invigilator1_assign_time = null;
+      roomInvigilator.invigilator1_teacher_approval = false;
+    } else if (
+      roomInvigilator.invigilator2_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      await roomInvigilator.populate('invigilator2_id', 'sap_id name');
+      rejectedInvigilator = roomInvigilator.invigilator2_id;
+
+      roomInvigilator.invigilator2_controller_approval = false;
+      roomInvigilator.invigilator2_controller_approved_by = null;
+      roomInvigilator.invigilator2_id = null;
+      roomInvigilator.invigilator2_assign_time = null;
+      roomInvigilator.invigilator2_teacher_approval = false;
+    } else {
+      throw new HttpException('Bad request', 400);
+    }
+
+    await roomInvigilator.save();
+
+    return {
+      message: 'Invigilator rejected. Name: ' + rejectedInvigilator.name,
+    };
+  }
+
   async approveInvigilator(
     approveInvigilatorDto: ApproveInvigilatorDto,
     controllerId: string,

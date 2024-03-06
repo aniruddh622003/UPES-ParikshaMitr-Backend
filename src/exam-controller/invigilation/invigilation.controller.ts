@@ -79,6 +79,18 @@ export class InvigilationController {
   }
 
   @UseGuards(ExamContGuard)
+  @Patch('/room/reject-invigilator')
+  rejectInvigilator(
+    @Body() approveInvigilatorDto: ApproveInvigilatorDto,
+    @Req() req,
+  ) {
+    return this.invigilationService.rejectInvigilator(
+      approveInvigilatorDto,
+      req?.user.id,
+    );
+  }
+
+  @UseGuards(ExamContGuard)
   @Patch('/room/create-seating-plan')
   createSeatingPlan(@Body() body: CreateSeatingPlanDto) {
     return this.invigilationService.createSeatingPlan(body);
