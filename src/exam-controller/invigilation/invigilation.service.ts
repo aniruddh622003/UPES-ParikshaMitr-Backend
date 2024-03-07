@@ -116,15 +116,28 @@ export class InvigilationService {
       .populate('invigilator2_id')
       .populate('room_id');
 
+    // Attach slots to rooms
+    const roomIds = roomswithPendingInvigilator.map((room) => room.room_id);
+    const slots = await this.slotModel.find({ rooms: { $in: roomIds } });
+
     const returnObj = roomswithPendingInvigilator.map((room) => {
       const temp = {};
       temp['room_id'] = (room.room_id as any)._id;
       temp['room_no'] = (room.room_id as any).room_no;
+      temp['slot_time'] = slots.find((slot) =>
+        (slot.rooms as any).includes((room.room_id as any)._id),
+      ).timeSlot;
       if (room.invigilator1_id) {
         temp['invigilator1'] = {
           id: (room.invigilator1_id as any)._id,
           sap_id: (room.invigilator1_id as any).sap_id,
           name: (room.invigilator1_id as any).name,
+          scan_date: room.invigilator1_assign_time.toLocaleDateString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
+          scan_time: room.invigilator1_assign_time.toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
         };
         temp['invigilator1_controller_approval'] =
           room.invigilator1_controller_approval;

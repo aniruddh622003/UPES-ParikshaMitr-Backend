@@ -248,7 +248,7 @@ export class InvigilationService {
       }
       roomInvigilator.invigilator2_teacher_approval = true;
     } else {
-      throw new HttpException('Bad request', 400);
+      throw new HttpException('Invigilator not assigned', 404);
     }
     await roomInvigilator.save();
 
