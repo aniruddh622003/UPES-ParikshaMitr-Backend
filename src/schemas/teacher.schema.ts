@@ -16,6 +16,26 @@ export class Teacher {
   @Prop()
   password: string;
 
+  @Prop({
+    validate: {
+      validator: function (v: number) {
+        return v.toString().length === 10;
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+  })
+  phone: number;
+
+  @Prop({
+    validate: {
+      validator: function (v: string) {
+        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid email!`,
+    },
+  })
+  email: string;
+
   @Prop({ default: false })
   approved: boolean;
 }

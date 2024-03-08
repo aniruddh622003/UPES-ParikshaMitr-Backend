@@ -148,9 +148,30 @@ export class InvigilationService {
           id: (room.invigilator2_id as any)._id,
           sap_id: (room.invigilator2_id as any).sap_id,
           name: (room.invigilator2_id as any).name,
+          scan_date: room.invigilator2_assign_time.toLocaleDateString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
+          scan_time: room.invigilator2_assign_time.toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
         };
         temp['invigilator2_controller_approval'] =
           room.invigilator2_controller_approval;
+      }
+      if (room.invigilator3_id) {
+        temp['invigilator3'] = {
+          id: (room.invigilator3_id as any)._id,
+          sap_id: (room.invigilator3_id as any).sap_id,
+          name: (room.invigilator3_id as any).name,
+          scan_date: room.invigilator3_assign_time.toLocaleDateString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
+          scan_time: room.invigilator3_assign_time.toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+          }),
+        };
+        temp['invigilator3_controller_approval'] =
+          room.invigilator3_controller_approval;
       }
       return temp;
     });
@@ -227,6 +248,7 @@ export class InvigilationService {
       approveInvigilatorDto.invigilatorId
     ) {
       roomInvigilator.invigilator1_controller_approval = true;
+      roomInvigilator.invigilator1_teacher_approval = true;
       roomInvigilator.invigilator1_controller_approved_by = controllerId;
       await roomInvigilator.populate('invigilator1_id', 'sap_id name');
       approvedInvigilator = roomInvigilator.invigilator1_id;
@@ -235,9 +257,19 @@ export class InvigilationService {
       approveInvigilatorDto.invigilatorId
     ) {
       roomInvigilator.invigilator2_controller_approval = true;
+      roomInvigilator.invigilator2_teacher_approval = true;
       roomInvigilator.invigilator2_controller_approved_by = controllerId;
       await roomInvigilator.populate('invigilator2_id', 'sap_id name');
       approvedInvigilator = roomInvigilator.invigilator2_id;
+    } else if (
+      roomInvigilator.invigilator3_id.toString() ===
+      approveInvigilatorDto.invigilatorId
+    ) {
+      roomInvigilator.invigilator3_controller_approval = true;
+      roomInvigilator.invigilator3_teacher_approval = true;
+      roomInvigilator.invigilator3_controller_approved_by = controllerId;
+      await roomInvigilator.populate('invigilator3_id', 'sap_id name');
+      approvedInvigilator = roomInvigilator.invigilator3_id;
     } else {
       throw new HttpException('Bad request', 400);
     }

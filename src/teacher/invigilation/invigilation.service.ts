@@ -42,6 +42,10 @@ export class InvigilationService {
       uniqueCode: unique_code,
     });
 
+    if (!curr_slot) {
+      throw new HttpException('Invalid unique code', 400);
+    }
+
     if (curr_slot.isDeletable) {
       curr_slot.isDeletable = false;
       await curr_slot.save();
@@ -199,22 +203,7 @@ export class InvigilationService {
 
     const room = await this.roomModel.findById(invigilator.room_id);
 
-    const qPaperNos = {};
-    const ansSheetNos = room.students.length;
-
-    for (let i = 0; i < room.students.length; i++) {
-      if (!qPaperNos[room.students[i].subject]) {
-        qPaperNos[room.students[i].subject] = 1;
-      } else {
-        qPaperNos[room.students[i].subject] += 1;
-      }
-    }
-
-    const res = [{ type: 'Answer Sheet', quantity: ansSheetNos }];
-    for (const key in qPaperNos) {
-      res.push({ type: key + ' Question Paper', quantity: qPaperNos[key] });
-    }
-    return { message: 'Total Supplies Info', data: res };
+    return { message: 'Total Supplies Info', data: [] };
   }
 
   async approveInvigilator(
