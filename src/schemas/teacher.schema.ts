@@ -19,20 +19,24 @@ export class Teacher {
   @Prop({
     validate: {
       validator: function (v: number) {
+        if (v === null) return true;
         return v.toString().length === 10;
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
+    default: null,
   })
   phone: number;
 
   @Prop({
     validate: {
       validator: function (v: string) {
+        if (v === null) return true;
         return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(v);
       },
       message: (props) => `${props.value} is not a valid email!`,
     },
+    default: null,
   })
   email: string;
 

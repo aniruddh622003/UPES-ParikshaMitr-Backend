@@ -136,6 +136,8 @@ export class TeacherService {
           sap_id: teacher.sap_id,
           name: teacher.name,
           approved: teacher.approved,
+          phone: teacher.phone,
+          email: teacher.email,
         },
       };
     } catch (err) {
@@ -148,8 +150,34 @@ export class TeacherService {
     }
   }
 
-  update(id: number, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`;
+  async update(id: number, updateTeacherDto: UpdateTeacherDto) {
+    const update = await this.teacherModel.findByIdAndUpdate(
+      id,
+      {
+        phone: updateTeacherDto.phone,
+        email: updateTeacherDto.email,
+      },
+      { new: true },
+    );
+
+    if (!update) {
+      throw new HttpException(
+        {
+          message: 'Teacher not found',
+        },
+        404,
+      );
+    }
+
+    return {
+      message: 'Teacher updated successfully',
+      data: {
+        sap_id: update.sap_id,
+        name: update.name,
+        phone: update.phone,
+        email: update.email,
+      },
+    };
   }
 
   remove(id: number) {

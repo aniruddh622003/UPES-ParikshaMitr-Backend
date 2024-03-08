@@ -38,11 +38,16 @@ export class TeacherController {
     };
   }
 
-  //TODO: Get details of the teacher from JWT
   @UseGuards(TeacherJwtGuard)
   @Get('getDetails')
   getDetails(@Req() req) {
     return this.teacherService.findOne(req?.user?.id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Patch('updateDetails')
+  updateDetails(@Req() req, @Body() updateTeacherDto: UpdateTeacherDto) {
+    return this.teacherService.update(req?.user?.id, updateTeacherDto);
   }
 
   @UseGuards(TeacherJwtGuard)
@@ -65,11 +70,6 @@ export class TeacherController {
   @Get('/find/:id')
   findOne(@Param('id') id: string) {
     return this.teacherService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
-    return this.teacherService.update(+id, updateTeacherDto);
   }
 
   @Delete(':id')
