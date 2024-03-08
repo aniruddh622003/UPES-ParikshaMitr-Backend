@@ -19,6 +19,7 @@ import {
   PendingSupplies,
   PendingSuppliesDocument,
 } from '../../schemas/pending-supplies.schema';
+import { ChangeRoomStatusesDto } from './dto/change-room-statuses.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -444,6 +445,17 @@ export class InvigilationService {
     await slot.deleteOne();
     return {
       message: 'Slot deleted',
+    };
+  }
+
+  async changeRoomStatus(body: ChangeRoomStatusesDto) {
+    await this.roomModel.updateMany(
+      { _id: { $in: body.room_ids } },
+      { status: body.status },
+    );
+
+    return {
+      message: 'Room statuses updated',
     };
   }
 }

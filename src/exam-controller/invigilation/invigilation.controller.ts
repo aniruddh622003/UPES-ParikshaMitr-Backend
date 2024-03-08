@@ -20,6 +20,7 @@ import { CreateSlotDto } from './dto/create-slot.dto';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 import { ExamContGuard } from '../../guards/cont-guard.guard';
 import { EditContactDto } from './dto/edit-contact.dto';
+import { ChangeRoomStatusesDto } from './dto/change-room-statuses.dto';
 
 @Controller('exam-controller/invigilation')
 export class InvigilationController {
@@ -58,6 +59,12 @@ export class InvigilationController {
   @Post('/room')
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.invigilationService.createRoom(createRoomDto);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Patch('/room/change-statuses')
+  changeRoomStatus(@Body() body: ChangeRoomStatusesDto) {
+    return this.invigilationService.changeRoomStatus(body);
   }
 
   @UseGuards(ExamContGuard)
