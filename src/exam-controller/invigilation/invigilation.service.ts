@@ -194,7 +194,7 @@ export class InvigilationService {
     let rejectedInvigilator;
 
     if (
-      roomInvigilator.invigilator1_id.toString() ===
+      roomInvigilator.invigilator1_id?.toString() ===
       approveInvigilatorDto.invigilatorId
     ) {
       await roomInvigilator.populate('invigilator1_id', 'sap_id name');
@@ -206,7 +206,7 @@ export class InvigilationService {
       roomInvigilator.invigilator1_assign_time = null;
       roomInvigilator.invigilator1_teacher_approval = false;
     } else if (
-      roomInvigilator.invigilator2_id.toString() ===
+      roomInvigilator.invigilator2_id?.toString() ===
       approveInvigilatorDto.invigilatorId
     ) {
       await roomInvigilator.populate('invigilator2_id', 'sap_id name');
