@@ -13,6 +13,7 @@ import {
   Notification,
   NotificationSchema,
 } from '../schemas/notification.schema';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import {
     }),
     ContTeacherModule,
     InvigilationModule,
+    StudentModule,
   ],
   controllers: [ExamControllerController],
   providers: [ExamControllerService],
