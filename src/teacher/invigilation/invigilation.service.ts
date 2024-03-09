@@ -278,6 +278,81 @@ export class InvigilationService {
     };
   }
 
+  async addSupplies(body: UpdateSuppliesDto, teacher_id: any) {
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: body.room_id,
+      $or: [
+        {
+          invigilator1_id: teacher_id,
+        },
+        {
+          invigilator2_id: teacher_id,
+        },
+      ],
+    });
+
+    if (!invigilator) {
+      throw new HttpException('Invigilator not assigned to this room', 404);
+    }
+
+    if (invigilator.invigilator1_id?.toString() == teacher_id) {
+      if (invigilator.invigilator1_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
+
+    if (invigilator.invigilator2_id?.toString() == teacher_id) {
+      if (invigilator.invigilator2_controller_approval === false) {
+        throw new HttpException('Invigilator not approved by controller', 400);
+      }
+    }
+
+    const pending = await this.pendingSuppliesModel.findOne({
+      room_id: invigilator.room_id,
+    });
+
+    if (pending) {
+      for (const supply of body.pending_supplies) {
+        const idx = pending.pending_supplies.findIndex(
+          (p_supply) => p_supply.suppl_type === supply.type,
+        );
+        if (idx === -1) {
+          pending.pending_supplies.push({
+            suppl_type: supply.type,
+            quantity: supply.quantity,
+            total: supply.quantity,
+          });
+        } else {
+          pending.pending_supplies[idx].quantity += supply.quantity;
+          pending.pending_supplies[idx].total += supply.quantity;
+        }
+      }
+
+      await pending.save();
+
+      return {
+        message: 'Supplies Added',
+      };
+    }
+
+    const pendingSupplies = new this.pendingSuppliesModel({
+      room_id: invigilator.room_id,
+      pending_supplies: body.pending_supplies.map((supply) => {
+        return {
+          suppl_type: supply.type,
+          quantity: supply.quantity,
+          total: supply.quantity,
+        };
+      }),
+    });
+
+    await pendingSupplies.save();
+
+    return {
+      message: 'Supplies Added',
+    };
+  }
+
   async updateSupplies(body: UpdateSuppliesDto, teacher_id: any) {
     const invigilator = await this.roomInvigilatorModel.findOne({
       room_id: body.room_id,
@@ -323,14 +398,10 @@ export class InvigilationService {
       if (supply.quantity > pending.pending_supplies[idx].quantity) {
         throw new HttpException('Invalid Quantity for ' + supply.type, 400);
       }
+
+      pending.pending_supplies[idx].quantity = supply.quantity;
     }
 
-    pending.pending_supplies = body.pending_supplies.map((supply) => {
-      return {
-        suppl_type: supply.type,
-        quantity: supply.quantity,
-      };
-    }) as any;
     await pending.save();
 
     return {

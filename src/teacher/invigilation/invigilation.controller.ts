@@ -52,6 +52,12 @@ export class InvigilationController {
   }
 
   @UseGuards(TeacherJwtGuard)
+  @Patch('add-supplies')
+  addSupplies(@Body() body: UpdateSuppliesDto, @Req() req) {
+    return this.invigilationService.addSupplies(body, req?.user.id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
   @Patch('update-supplies')
   updateSupplies(@Body() body: UpdateSuppliesDto, @Req() req) {
     return this.invigilationService.updateSupplies(body, req?.user.id);

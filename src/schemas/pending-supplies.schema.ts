@@ -16,6 +16,10 @@ export class PendingSupplies {
       {
         suppl_type: String,
         quantity: Number,
+        total: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
     _id: false,
@@ -24,6 +28,7 @@ export class PendingSupplies {
     {
       suppl_type: string;
       quantity: number;
+      total: number;
     },
   ];
 }
