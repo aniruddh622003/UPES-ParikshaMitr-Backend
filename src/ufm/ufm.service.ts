@@ -175,7 +175,8 @@ export class UfmService {
       throw new HttpException('Slot not found', 404);
     }
 
-    const res = [];
+    const r: any = {};
+    r['slot'] = slot.toObject();
     for (const ufm of slot.ufms) {
       const room = await this.roomModel.findById((ufm as any).room, {
         students: {
@@ -188,8 +189,7 @@ export class UfmService {
       if (!room) {
         throw new HttpException('Room not found', 404);
       }
-      const r: any = {};
-      r['slot'] = slot.toObject();
+
       r.slot.ufms[slot.ufms.indexOf(ufm)].room = {
         room_no: room.room_no,
         block: room.block,
@@ -217,10 +217,9 @@ export class UfmService {
         subject_code: room.students[0].subject_code,
         seat_no: room.students[0].seat_no,
       };
-      res.push(r);
     }
 
-    return res;
+    return r;
   }
 
   async getUFMById(id) {

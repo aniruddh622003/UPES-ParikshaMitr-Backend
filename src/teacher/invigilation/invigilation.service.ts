@@ -314,11 +314,11 @@ export class InvigilationService {
     if (pending) {
       for (const supply of body.pending_supplies) {
         const idx = pending.pending_supplies.findIndex(
-          (p_supply) => p_supply.suppl_type === supply.type,
+          (p_supply) => p_supply.suppl_type === supply.type.toLowerCase(),
         );
         if (idx === -1) {
           pending.pending_supplies.push({
-            suppl_type: supply.type,
+            suppl_type: supply.type.toLowerCase(),
             quantity: supply.quantity,
             total: supply.quantity,
           });
@@ -339,7 +339,7 @@ export class InvigilationService {
       room_id: invigilator.room_id,
       pending_supplies: body.pending_supplies.map((supply) => {
         return {
-          suppl_type: supply.type,
+          suppl_type: supply.type.toLowerCase(),
           quantity: supply.quantity,
           total: supply.quantity,
         };
@@ -390,7 +390,7 @@ export class InvigilationService {
 
     for (const supply of body.pending_supplies) {
       const idx = pending.pending_supplies.findIndex(
-        (p_supply) => p_supply.suppl_type === supply.type,
+        (p_supply) => p_supply.suppl_type === supply.type.toLowerCase(),
       );
       if (idx === -1) {
         throw new HttpException('Invalid Supply Type', 400);
