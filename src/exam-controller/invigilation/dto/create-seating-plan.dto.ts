@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-class Student {
+export class Student {
   @IsNumber()
   @IsNotEmpty()
   sap_id: number;
@@ -42,4 +42,15 @@ export class CreateSeatingPlanDto {
   @ValidateNested({ each: true })
   @Type(() => Student)
   seating_plan: Student[];
+}
+
+export class AddStudentDto {
+  @IsString()
+  room_id: string;
+
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => Student)
+  student: Student;
 }

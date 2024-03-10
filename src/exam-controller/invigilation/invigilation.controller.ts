@@ -14,7 +14,11 @@ import {
 import { InvigilationService } from './invigilation.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
-import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
+import {
+  AddStudentDto,
+  CreateSeatingPlanDto,
+  Student,
+} from './dto/create-seating-plan.dto';
 import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
@@ -101,6 +105,12 @@ export class InvigilationController {
   @Patch('/room/create-seating-plan')
   createSeatingPlan(@Body() body: CreateSeatingPlanDto) {
     return this.invigilationService.createSeatingPlan(body);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Patch('/room/add-student')
+  addStudentToRoom(@Body() body: AddStudentDto) {
+    return this.invigilationService.addStudentToRoom(body);
   }
 
   @UseGuards(ExamContGuard)

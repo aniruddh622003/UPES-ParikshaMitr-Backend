@@ -8,7 +8,10 @@ import {
 } from '../../schemas/room-invigilator.schema';
 import { Model } from 'mongoose';
 import { ApproveInvigilatorDto } from './dto/approve-invigilator.dto';
-import { CreateSeatingPlanDto } from './dto/create-seating-plan.dto';
+import {
+  AddStudentDto,
+  CreateSeatingPlanDto,
+} from './dto/create-seating-plan.dto';
 import { EditStudentEligibilityDto } from './dto/edit-student-eligibility.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
@@ -287,6 +290,32 @@ export class InvigilationService {
     };
   }
 
+  async addStudentToRoom(body: AddStudentDto) {
+    const room = await this.roomModel.findById(body.room_id);
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    if (room.status === 'COMPLETED') {
+      throw new HttpException('Room already Completed', 400);
+    }
+
+    if (room.students.find((st) => st.sap_id === body.student.sap_id)) {
+      throw new HttpException('Student already exists', 409);
+    }
+
+    if (room.students.find((st) => st.seat_no === body.student.seat_no)) {
+      throw new HttpException('Seat already occupied', 409);
+    }
+
+    room.students.push(body.student as any);
+    await room.save();
+
+    return {
+      message: 'Student added to room',
+    };
+  }
+
   async createSeatingPlan(body: CreateSeatingPlanDto) {
     const roomDoc = await this.roomModel.findById(body.room_id);
     if (!roomDoc) {
@@ -373,27 +402,21 @@ export class InvigilationService {
   }
 
   async getTotalSupplies(room_id: string) {
-    const room = await this.roomModel.findById(room_id);
+    const supplies = await this.pendingSuppliesModel.findOne({
+      room_id,
+    });
 
-    if (!room) {
-      throw new HttpException('Room not found', 404);
+    if (!supplies) {
+      return { message: 'Total Supplies Info', data: [] };
     }
 
-    const qPaperNos = {};
-    const ansSheetNos = room.students.length;
+    const res = supplies.pending_supplies.map((suppl) => {
+      return {
+        type: suppl.suppl_type,
+        quantity: suppl.total,
+      };
+    });
 
-    for (let i = 0; i < room.students.length; i++) {
-      if (!qPaperNos[room.students[i].subject]) {
-        qPaperNos[room.students[i].subject] = 1;
-      } else {
-        qPaperNos[room.students[i].subject] += 1;
-      }
-    }
-
-    const res = [{ type: 'Answer Sheet', quantity: ansSheetNos }];
-    for (const key in qPaperNos) {
-      res.push({ type: key + ' Question Paper', quantity: qPaperNos[key] });
-    }
     return { message: 'Total Supplies Info', data: res };
   }
 
