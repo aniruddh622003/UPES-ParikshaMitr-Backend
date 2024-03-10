@@ -84,6 +84,10 @@ export class Room {
           ref: 'Teacher',
           default: null,
         },
+        new_ans_sheet_number: {
+          type: Number,
+          default: null,
+        },
       },
     ],
   })
@@ -109,6 +113,7 @@ export class Room {
       attendance_by?: string;
       UFM?: string;
       UFM_by?: string;
+      new_ans_sheet_number?: number;
     },
   ];
 }

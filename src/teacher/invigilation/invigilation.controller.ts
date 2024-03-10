@@ -106,4 +106,10 @@ export class InvigilationController {
   getContactDetails(@Query('slot_id') slot_id: string) {
     return this.invigilationService.getContactDetails(slot_id);
   }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('get-invigilators')
+  getInvigilators(@Query('room_id') room_id: string) {
+    return this.invigilationService.getInvigilators(room_id);
+  }
 }

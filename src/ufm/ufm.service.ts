@@ -44,6 +44,10 @@ export class UfmService {
 
     const student = room.students[studentIdx];
 
+    if (!student.attendance) {
+      throw new HttpException('Can not mark UFM to absent students', 400);
+    }
+
     if (student.UFM) {
       throw new HttpException('Student already marked UFM', 400);
     }
@@ -56,7 +60,7 @@ export class UfmService {
       },
       course: student.course,
       exam_date: slot[0].date,
-      exam_time: slot[0].timeSlot == 'Morning' ? '10:00 AM' : '2:00 PM',
+      exam_time: slot[0].timeSlot,
       room: body.room_id,
       student: {
         name: student.student_name,
@@ -69,6 +73,7 @@ export class UfmService {
       incriminating_material: body.incriminating_material,
       recovered_from: body.recovered_from,
       other_mode_of_misconduct: body.other_mode_of_misconduct,
+      student_remarks: body.student_remarks,
     });
 
     try {
@@ -79,6 +84,10 @@ export class UfmService {
 
     student.UFM = ufm._id.toString();
     student.UFM_by = teacher.id;
+
+    if (body.new_sheet_number) {
+      student.new_ans_sheet_number = body.new_sheet_number;
+    }
 
     try {
       await room.save();
@@ -95,5 +104,65 @@ export class UfmService {
     }
 
     return ufm;
+  }
+
+  async getAllUFMs() {
+    const slots = await this.slotModel
+      .find({
+        ufms: { $exists: true, $not: { $size: 0 } },
+      })
+      .populate({
+        path: 'ufms',
+      });
+
+    const res = [];
+
+    for (const slot of slots) {
+      const r: any = {};
+      r['slot'] = slot.toObject();
+      for (const ufm of slot.ufms) {
+        const room = await this.roomModel.findById((ufm as any).room, {
+          students: {
+            $elemMatch: { sap_id: (ufm as any).student.sap_id },
+          },
+          room_no: 1,
+          room_invigilator_id: 1,
+          block: 1,
+        });
+        if (!room) {
+          throw new HttpException('Room not found', 404);
+        }
+        r.slot.ufms[slot.ufms.indexOf(ufm)].room = {
+          room_no: room.room_no,
+          block: room.block,
+        };
+        r.slot.ufms[slot.ufms.indexOf(ufm)].UFM_by =
+          await this.teacherModel.findById(room.students[0].UFM_by, {
+            name: 1,
+            sap_id: 1,
+            email: 1,
+            phone: 1,
+          });
+
+        r.slot.ufms[slot.ufms.indexOf(ufm)].new_ans_sheet_number =
+          room.students[0].new_ans_sheet_number;
+
+        r.slot.ufms[slot.ufms.indexOf(ufm)].old_ans_sheet_number =
+          room.students[0].ans_sheet_number;
+
+        r.slot.ufms[slot.ufms.indexOf(ufm)].student = {
+          ...r.slot.ufms[slot.ufms.indexOf(ufm)].student,
+          roll_no: room.students[0].roll_no,
+          course: room.students[0].course,
+          exam_type: room.students[0].exam_type,
+          subject: room.students[0].subject,
+          subject_code: room.students[0].subject_code,
+          seat_no: room.students[0].seat_no,
+        };
+      }
+      res.push(r);
+    }
+
+    return res;
   }
 }

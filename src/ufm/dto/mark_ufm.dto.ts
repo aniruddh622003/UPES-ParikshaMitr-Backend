@@ -5,6 +5,7 @@ import {
   IsNotEmptyObject,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
   Length,
   ValidateNested,
@@ -88,4 +89,11 @@ export class MarkUFMDto {
 
   @IsString()
   other_mode_of_misconduct: string;
+
+  @IsString()
+  student_remarks: string;
+
+  @IsOptional()
+  @IsNumber()
+  new_sheet_number: number;
 }

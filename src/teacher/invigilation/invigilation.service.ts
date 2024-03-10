@@ -454,6 +454,11 @@ export class InvigilationService {
     const eligibleStudents =
       totalStudents - DebarredStudents - F_HoldStudents - r_holdStudents;
 
+    (room.students as any) = room.students.map((student) => {
+      (student.eligible as any) = student.UFM ? 'UFM' : student.eligible;
+      return student;
+    });
+
     return {
       message: 'Seating Plan',
       data: {
@@ -667,6 +672,30 @@ export class InvigilationService {
     return {
       message: 'Contact Details',
       data: slot.contact,
+    };
+  }
+
+  async getInvigilators(room_id) {
+    const invigilators = await this.roomInvigilatorModel
+      .findOne({
+        room_id,
+      })
+      .populate(
+        'invigilator1_id invigilator2_id invigilator3_id',
+        'name sap_id email phone',
+      );
+
+    if (!invigilators) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    return {
+      message: 'Invigilators',
+      data: {
+        inv1: invigilators.invigilator1_id,
+        inv2: invigilators.invigilator2_id,
+        inv3: invigilators.invigilator3_id,
+      },
     };
   }
 }

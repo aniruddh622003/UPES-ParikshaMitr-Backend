@@ -128,7 +128,9 @@ export class StudentService {
         roll_no: res[0]?.student?.roll_no,
         name: res[0]?.student?.student_name,
         a: 'X',
-        rooms: res,
+        rooms: res.sort((a, b) =>
+          new Date(a.slot.date) < new Date(b.slot.date) ? 1 : -1,
+        ),
       },
     };
   }

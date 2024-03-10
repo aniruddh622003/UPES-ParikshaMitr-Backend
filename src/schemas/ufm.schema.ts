@@ -122,6 +122,11 @@ export class UFM {
     default: '',
   })
   other_mode_of_misconduct: string;
+
+  @Prop({
+    default: '',
+  })
+  student_remarks: string;
 }
 
 export const UFMSchema = SchemaFactory.createForClass(UFM);
