@@ -17,6 +17,10 @@ export class StudentService {
     }
     let room;
     if (sap_id) {
+      if (isNaN(parseInt(sap_id))) {
+        throw new HttpException('Invalid SAP ID', 400);
+      }
+
       room = await this.roomModel
         .find(
           { 'students.sap_id': sap_id },
