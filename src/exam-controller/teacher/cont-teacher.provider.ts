@@ -148,14 +148,24 @@ export class ContTeacherService {
           400,
         );
       }
+
       if (body.name) {
         teacher.name = body.name;
       }
+      if (body.email) {
+        teacher.email = body.email;
+      }
+      if (body.phone) {
+        teacher.phone = body.phone;
+      }
+
       await teacher.save();
       return {
         message: 'Teacher edited successfully',
         data: {
           name: teacher.name,
+          phone: teacher.phone,
+          email: teacher.email,
         },
       };
     } catch (err) {
@@ -167,9 +177,17 @@ export class ContTeacherService {
           400,
         );
       }
+      if (err.name === 'ValidationError') {
+        throw new HttpException(
+          {
+            message: err.message,
+          },
+          400,
+        );
+      }
       throw new HttpException(
         {
-          message: 'Something went wrong',
+          message: err,
         },
         500,
       );

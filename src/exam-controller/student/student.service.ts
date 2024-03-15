@@ -62,6 +62,8 @@ export class StudentService {
     }
 
     if (roll_no) {
+      // Roll no characters to uppercase
+      roll_no = roll_no.toUpperCase();
       room = await this.roomModel
         .find(
           { 'students.roll_no': roll_no },

@@ -9,6 +9,8 @@ import {
   RoomInvigilatorSchema,
 } from '../../schemas/room-invigilator.schema';
 import { Slot, SlotSchema } from '../../schemas/slot.schema';
+import { ExamController } from '../entities/exam-controller.entity';
+import { ExamControllerSchema } from '../../schemas/exam-controller.schema';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { Slot, SlotSchema } from '../../schemas/slot.schema';
       { name: Room.name, schema: RoomSchema },
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
       { name: Slot.name, schema: SlotSchema },
+      { name: ExamController.name, schema: ExamControllerSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

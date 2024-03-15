@@ -11,18 +11,20 @@ import {
   RoomInvigilatorSchema,
 } from '../../schemas/room-invigilator.schema';
 import { Room, RoomSchema } from '../../schemas/room.schema';
+import { ExamController } from '../entities/exam-controller.entity';
+import { ExamControllerSchema } from '../../schemas/exam-controller.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Teacher.name, schema: TeacherSchema }]),
     MongooseModule.forFeature([
+      { name: Teacher.name, schema: TeacherSchema },
       { name: Schedule.name, schema: ScheduleSchema },
-    ]),
-    MongooseModule.forFeature([{ name: Slot.name, schema: SlotSchema }]),
-    MongooseModule.forFeature([
+      { name: ExamController.name, schema: ExamControllerSchema },
+      { name: Slot.name, schema: SlotSchema },
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
+      { name: Room.name, schema: RoomSchema },
     ]),
-    MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
+
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.JWT_SECRET,

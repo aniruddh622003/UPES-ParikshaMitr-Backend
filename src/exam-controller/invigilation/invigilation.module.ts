@@ -13,6 +13,8 @@ import {
   PendingSupplies,
   PendingSuppliesSchema,
 } from '../../schemas/pending-supplies.schema';
+import { ExamController } from '../entities/exam-controller.entity';
+import { ExamControllerSchema } from '../../schemas/exam-controller.schema';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import {
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
       { name: Slot.name, schema: SlotSchema },
       { name: PendingSupplies.name, schema: PendingSuppliesSchema },
+      { name: ExamController.name, schema: ExamControllerSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

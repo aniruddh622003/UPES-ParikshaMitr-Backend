@@ -5,11 +5,21 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
+import {
+  ExamController,
+  ExamControllerDocument,
+} from '../schemas/exam-controller.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ExamContGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @InjectModel(ExamController.name)
+    private examControllerModel: Model<ExamControllerDocument>,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -32,6 +42,15 @@ export class ExamContGuard implements CanActivate {
             message: 'Invalid Role',
           },
           403,
+        );
+      }
+      const user = await this.examControllerModel.findById(payload.id);
+      if (!user) {
+        throw new HttpException(
+          {
+            message: 'Invalid User',
+          },
+          401,
         );
       }
       request['user'] = payload;

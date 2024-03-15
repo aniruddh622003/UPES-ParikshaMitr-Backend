@@ -7,6 +7,10 @@ import { Room, RoomSchema } from '../schemas/room.schema';
 import { UFM, UFMSchema } from '../schemas/ufm.schema';
 import { Teacher, TeacherSchema } from '../schemas/teacher.schema';
 import { Slot, SlotSchema } from '../schemas/slot.schema';
+import {
+  ExamController,
+  ExamControllerSchema,
+} from '../schemas/exam-controller.schema';
 
 @Module({
   imports: [
@@ -15,6 +19,7 @@ import { Slot, SlotSchema } from '../schemas/slot.schema';
       { name: Room.name, schema: RoomSchema },
       { name: UFM.name, schema: UFMSchema },
       { name: Slot.name, schema: SlotSchema },
+      { name: ExamController.name, schema: ExamControllerSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

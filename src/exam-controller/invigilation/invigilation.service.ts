@@ -23,6 +23,7 @@ import {
   PendingSuppliesDocument,
 } from '../../schemas/pending-supplies.schema';
 import { ChangeRoomStatusesDto } from './dto/change-room-statuses.dto';
+import { ManualAssignDto } from './dto/update-invigilation.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -511,6 +512,73 @@ export class InvigilationService {
 
     return {
       message: 'Room statuses updated',
+    };
+  }
+
+  async manualAssign(body: ManualAssignDto, contId) {
+    const slot = await this.slotModel.findById(body.slotId);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+    if (!slot.isDeletable) {
+      throw new HttpException(
+        'Manual assignment of invigilator not allowed after random assignment started',
+        400,
+      );
+    }
+
+    const roomInv = await this.roomInvigilatorModel.findOne({
+      room_id: body.roomId,
+    });
+
+    if (!roomInv) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    if (
+      roomInv.invigilator1_id === body.invigilatorId ||
+      roomInv.invigilator2_id === body.invigilatorId ||
+      roomInv.invigilator3_id === body.invigilatorId
+    ) {
+      throw new HttpException('Invigilator already assigned', 409);
+    }
+
+    const invigilator = await this.roomInvigilatorModel.findOne({
+      $or: [
+        { invigilator1_id: body.invigilatorId },
+        { invigilator2_id: body.invigilatorId },
+        { invigilator3_id: body.invigilatorId },
+      ],
+    });
+
+    if (invigilator) {
+      throw new HttpException('Invigilator already assigned', 409);
+    }
+
+    if (!roomInv.invigilator1_id) {
+      roomInv.invigilator1_id = body.invigilatorId;
+      roomInv.invigilator1_assign_time = new Date();
+      roomInv.invigilator1_controller_approval = true;
+      roomInv.invigilator1_controller_approved_by = contId;
+      await roomInv.save();
+    } else if (!roomInv.invigilator2_id) {
+      roomInv.invigilator2_id = body.invigilatorId;
+      roomInv.invigilator2_assign_time = new Date();
+      roomInv.invigilator2_controller_approval = true;
+      roomInv.invigilator2_controller_approved_by = contId;
+      await roomInv.save();
+    } else if (!roomInv.invigilator3_id) {
+      roomInv.invigilator3_id = body.invigilatorId;
+      roomInv.invigilator3_assign_time = new Date();
+      roomInv.invigilator3_controller_approval = true;
+      roomInv.invigilator3_controller_approved_by = contId;
+      await roomInv.save();
+    } else {
+      throw new HttpException('Room already has 3 invigilators', 400);
+    }
+
+    return {
+      message: 'Invigilator assigned to room',
     };
   }
 }
