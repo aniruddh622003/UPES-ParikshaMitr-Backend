@@ -324,6 +324,26 @@ export class InvigilationService {
     }
 
     roomDoc.students = body.seating_plan as any;
+
+    if ((roomDoc.students.length as any) == 0) {
+      throw new HttpException('Seating plan cannot be empty', 400);
+    }
+
+    if ((roomDoc.students.length as any) <= 30) {
+      roomDoc.num_invigilators = 1;
+    }
+
+    if (
+      (roomDoc.students.length as any) > 30 &&
+      (roomDoc.students.length as any) <= 70
+    ) {
+      roomDoc.num_invigilators = 2;
+    }
+
+    if ((roomDoc.students.length as any) > 70) {
+      roomDoc.num_invigilators = 3;
+    }
+
     try {
       await roomDoc.save({
         validateBeforeSave: true,
@@ -535,14 +555,6 @@ export class InvigilationService {
       throw new HttpException('Room not found', 404);
     }
 
-    if (
-      roomInv.invigilator1_id === body.invigilatorId ||
-      roomInv.invigilator2_id === body.invigilatorId ||
-      roomInv.invigilator3_id === body.invigilatorId
-    ) {
-      throw new HttpException('Invigilator already assigned', 409);
-    }
-
     const invigilator = await this.roomInvigilatorModel.findOne({
       $or: [
         { invigilator1_id: body.invigilatorId },
@@ -555,19 +567,30 @@ export class InvigilationService {
       throw new HttpException('Invigilator already assigned', 409);
     }
 
+    const room = await this.roomModel.findById(body.roomId);
+
     if (!roomInv.invigilator1_id) {
+      if (room.num_invigilators < 1) {
+        throw new HttpException('Room does not require invigilator', 400);
+      }
       roomInv.invigilator1_id = body.invigilatorId;
       roomInv.invigilator1_assign_time = new Date();
       roomInv.invigilator1_controller_approval = true;
       roomInv.invigilator1_controller_approved_by = contId;
       await roomInv.save();
     } else if (!roomInv.invigilator2_id) {
+      if (room.num_invigilators < 2) {
+        throw new HttpException('Room does not require invigilator', 400);
+      }
       roomInv.invigilator2_id = body.invigilatorId;
       roomInv.invigilator2_assign_time = new Date();
       roomInv.invigilator2_controller_approval = true;
       roomInv.invigilator2_controller_approved_by = contId;
       await roomInv.save();
     } else if (!roomInv.invigilator3_id) {
+      if (room.num_invigilators < 3) {
+        throw new HttpException('Room does not require invigilator', 400);
+      }
       roomInv.invigilator3_id = body.invigilatorId;
       roomInv.invigilator3_assign_time = new Date();
       roomInv.invigilator3_controller_approval = true;

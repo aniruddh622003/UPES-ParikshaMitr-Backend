@@ -81,25 +81,38 @@ export class InvigilationService {
 
     const roomsWithEmptyInvigilator1 = await this.roomInvigilatorModel
       .find({
-        room_id: { $in: AllRooms },
+        room_id: {
+          $in: await this.roomModel
+            .find({
+              _id: { $in: AllRooms },
+              num_invigilators: { $gte: 1 },
+            })
+            .select('_id'),
+        },
         invigilator1_id: null,
       })
       .select('_id');
 
     if (roomsWithEmptyInvigilator1.length > 0) {
       emptyRooms = roomsWithEmptyInvigilator1;
-    } else {
+    }
+    if (emptyRooms.length === 0) {
       const roomsWithEmptyInvigilator2 = await this.roomInvigilatorModel
         .find({
-          room_id: { $in: AllRooms },
+          room_id: {
+            $in: await this.roomModel
+              .find({
+                _id: { $in: AllRooms },
+                num_invigilators: { $gte: 2 },
+              })
+              .select('_id'),
+          },
           invigilator2_id: null,
         })
         .select('_id');
 
       if (roomsWithEmptyInvigilator2.length > 0) {
         emptyRooms = roomsWithEmptyInvigilator2;
-      } else {
-        throw new HttpException('No Empty Rooms found', 404);
       }
     }
 
@@ -107,7 +120,7 @@ export class InvigilationService {
       // Find rooms in slot with more than 70 students
       const rooms = await this.roomModel.find({
         _id: { $in: AllRooms },
-        'students.67': { $exists: true },
+        num_invigilators: { $gte: 3 },
       });
 
       const roomInvigilators = await this.roomInvigilatorModel.find({
@@ -115,11 +128,11 @@ export class InvigilationService {
         invigilator3_id: null,
       });
 
-      if (roomInvigilators.length === 0) {
-        throw new HttpException('No Empty Rooms found', 404);
-      }
-
       emptyRooms = roomInvigilators;
+    }
+
+    if (emptyRooms.length === 0) {
+      throw new HttpException('No empty rooms', 400);
     }
 
     // Assign invigilator to a random empty room

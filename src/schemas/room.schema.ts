@@ -116,6 +116,12 @@ export class Room {
       new_ans_sheet_number?: number;
     },
   ];
+
+  @Prop({
+    required: true,
+    default: 0,
+  })
+  num_invigilators: number;
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);
