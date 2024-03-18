@@ -146,9 +146,12 @@ export class InvigilationService {
     if (roomInvigilator.invigilator1_id === null) {
       roomInvigilator.invigilator1_id = invigilator_id;
       roomInvigilator.invigilator1_assign_time = new Date();
-    } else {
+    } else if (roomInvigilator.invigilator2_id === null) {
       roomInvigilator.invigilator2_id = invigilator_id;
       roomInvigilator.invigilator2_assign_time = new Date();
+    } else {
+      roomInvigilator.invigilator3_id = invigilator_id;
+      roomInvigilator.invigilator3_assign_time = new Date();
     }
     await roomInvigilator.save();
 

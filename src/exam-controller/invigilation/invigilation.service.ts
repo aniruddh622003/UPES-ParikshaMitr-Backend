@@ -23,7 +23,10 @@ import {
   PendingSuppliesDocument,
 } from '../../schemas/pending-supplies.schema';
 import { ChangeRoomStatusesDto } from './dto/change-room-statuses.dto';
-import { ManualAssignDto } from './dto/update-invigilation.dto';
+import {
+  ManualAssignDto,
+  SetNumInvigilatorsDto,
+} from './dto/update-invigilation.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -602,6 +605,45 @@ export class InvigilationService {
 
     return {
       message: 'Invigilator assigned to room',
+    };
+  }
+
+  async setNumInvigilators(body: SetNumInvigilatorsDto) {
+    const room = await this.roomModel.findById(body.room_id);
+
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    const roominv = await this.roomInvigilatorModel.findOne({
+      room_id: body.room_id,
+    });
+
+    if (!roominv) {
+      throw new HttpException('Room not found', 404);
+    }
+
+    if (body.num_inv < 1 || body.num_inv > 3) {
+      throw new HttpException('Invalid number of invigilators', 400);
+    }
+
+    if (roominv.invigilator1_id && body.num_inv < 1) {
+      throw new HttpException('Room already has invigilator', 400);
+    }
+
+    if (roominv.invigilator2_id && body.num_inv < 2) {
+      throw new HttpException('Room already has 2 invigilators', 400);
+    }
+
+    if (roominv.invigilator3_id && body.num_inv < 3) {
+      throw new HttpException('Room already has 3 invigilators', 400);
+    }
+
+    room.num_invigilators = body.num_inv;
+    await room.save();
+
+    return {
+      message: 'Number of invigilators updated',
     };
   }
 }

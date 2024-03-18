@@ -25,7 +25,10 @@ import { AddRoomToSlotDto } from './dto/add-room-to-slot.sto';
 import { ExamContGuard } from '../../guards/cont-guard.guard';
 import { EditContactDto } from './dto/edit-contact.dto';
 import { ChangeRoomStatusesDto } from './dto/change-room-statuses.dto';
-import { ManualAssignDto } from './dto/update-invigilation.dto';
+import {
+  ManualAssignDto,
+  SetNumInvigilatorsDto,
+} from './dto/update-invigilation.dto';
 
 @Controller('exam-controller/invigilation')
 export class InvigilationController {
@@ -160,5 +163,11 @@ export class InvigilationController {
   @Patch('/manual-assign')
   manualAssign(@Body() body: ManualAssignDto, @Req() req) {
     return this.invigilationService.manualAssign(body, req?.user.id);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Patch('/room/set-num-invigilators')
+  setNumInvigilators(@Body() body: SetNumInvigilatorsDto) {
+    return this.invigilationService.setNumInvigilators(body);
   }
 }
