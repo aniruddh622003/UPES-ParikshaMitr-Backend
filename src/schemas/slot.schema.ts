@@ -48,6 +48,13 @@ export class Slot {
 
   @Prop({ default: true })
   isDeletable: boolean;
+
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'FlyingSquad',
+    default: [],
+  })
+  flying_squad: string[];
 }
 
 export const SlotSchema = SchemaFactory.createForClass(Slot);

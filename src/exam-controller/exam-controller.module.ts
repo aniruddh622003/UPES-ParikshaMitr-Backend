@@ -14,6 +14,7 @@ import {
   NotificationSchema,
 } from '../schemas/notification.schema';
 import { StudentModule } from './student/student.module';
+import { FlyingModule } from './flying/flying.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { StudentModule } from './student/student.module';
     ContTeacherModule,
     InvigilationModule,
     StudentModule,
+    FlyingModule,
   ],
   controllers: [ExamControllerController],
   providers: [ExamControllerService],
