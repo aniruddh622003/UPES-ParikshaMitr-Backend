@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Room, RoomDocument } from '../../schemas/room.schema';
@@ -32,6 +32,7 @@ import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
 
 @Injectable()
 export class InvigilationService {
+  private readonly logger = new Logger(InvigilationService.name);
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     @InjectModel(RoomInvigilator.name)
@@ -665,15 +666,31 @@ export class InvigilationService {
     }
 
     slot.flying_squad = await Promise.all(
-      body.fly_sap_ids.map(async (sap_id) =>
-        (await this.teacherModel.findOne({ sap_id }))._id.toString(),
-      ),
+      body.fly_sap_ids.map(async (sap_id) => {
+        const t_id = await this.teacherModel.findOne({ sap_id });
+        if (!t_id) {
+          throw new HttpException(
+            `Teacher with SAP ID: ${sap_id} not found`,
+            404,
+          );
+        }
+
+        return t_id._id.toString();
+      }),
     );
 
     slot.inv_duties = await Promise.all(
-      body.inv_sap_ids.map(async (sap_id) =>
-        (await this.teacherModel.findOne({ sap_id }))._id.toString(),
-      ),
+      body.inv_sap_ids.map(async (sap_id) => {
+        const t_id = await this.teacherModel.findOne({ sap_id });
+        if (!t_id) {
+          throw new HttpException(
+            `Teacher with SAP ID: ${sap_id} not found`,
+            404,
+          );
+        }
+
+        return t_id._id.toString();
+      }),
     );
 
     await slot.save();
