@@ -7,6 +7,7 @@ import {
 } from '../../schemas/flying-squad.schema';
 import { Model } from 'mongoose';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
+import { AssignRoomsDto } from './dto/assign-rooms.dto';
 
 @Injectable()
 export class FlyingService {
@@ -27,6 +28,20 @@ export class FlyingService {
     await slot.save();
     return {
       message: 'Flying squad member added successfully',
+    };
+  }
+
+  async assignRooms(body: AssignRoomsDto) {
+    const flyingSquad = await this.flyingSquadModel.findById(
+      body.flying_squad_id,
+    );
+    flyingSquad.rooms_assigned = body.room_ids.map((room) => ({
+      room_id: room,
+      status: 'assigned',
+    })) as any;
+    await flyingSquad.save();
+    return {
+      message: 'Rooms assigned successfully',
     };
   }
 }
