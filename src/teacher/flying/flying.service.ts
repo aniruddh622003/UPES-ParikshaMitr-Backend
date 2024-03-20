@@ -35,8 +35,9 @@ export class FlyingService {
           email: (data.teacher_id as any)?.email,
           phone: (data.teacher_id as any)?.phone,
         },
-        status: data.rooms_assigned.filter((room) => room.room_id == room_id)[0]
-          ?.status,
+        status: data.rooms_assigned?.filter(
+          (room) => room.room_id == room_id,
+        )[0]?.status,
       };
     });
 

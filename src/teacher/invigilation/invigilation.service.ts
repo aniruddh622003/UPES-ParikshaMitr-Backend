@@ -18,6 +18,10 @@ import {
 } from '../../schemas/pending-supplies.schema';
 import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
 import { SubmitControlletDto } from '../dto/submit.dto';
+import {
+  FlyingSquad,
+  FlyingSquadDocument,
+} from '../../schemas/flying-squad.schema';
 
 @Injectable()
 export class InvigilationService {
@@ -28,6 +32,8 @@ export class InvigilationService {
     @InjectModel(Slot.name) private slotModel: Model<Slot>,
     @InjectModel(PendingSupplies.name)
     private pendingSuppliesModel: Model<PendingSuppliesDocument>,
+    @InjectModel(FlyingSquad.name)
+    private flyingSquadModel: Model<FlyingSquadDocument>,
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
@@ -44,6 +50,28 @@ export class InvigilationService {
 
     if (!curr_slot) {
       throw new HttpException('Invalid unique code', 400);
+    }
+
+    const check_flying_squad = await this.flyingSquadModel
+      .findOne({
+        teacher_id: invigilator_id,
+        slot: curr_slot._id,
+      })
+      .populate('rooms_assigned.room_id', 'room_no');
+
+    if (check_flying_squad) {
+      return {
+        message: 'Flying Squad member assigned',
+        data: {
+          room_data: check_flying_squad.rooms_assigned.map((room) => {
+            return {
+              room_id: (room.room_id as any)._id,
+              room_no: (room.room_id as any).room_no,
+              status: room.status,
+            };
+          }),
+        },
+      };
     }
 
     if (curr_slot.isDeletable) {

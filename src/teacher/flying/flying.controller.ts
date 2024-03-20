@@ -1,4 +1,12 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { FlyingService } from './flying.service';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 

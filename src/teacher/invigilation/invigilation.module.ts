@@ -13,6 +13,10 @@ import {
   PendingSupplies,
   PendingSuppliesSchema,
 } from '../../schemas/pending-supplies.schema';
+import {
+  FlyingSquad,
+  FlyingSquadSchema,
+} from '../../schemas/flying-squad.schema';
 
 @Module({
   imports: [
@@ -21,6 +25,7 @@ import {
       { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
       { name: Slot.name, schema: SlotSchema },
       { name: PendingSupplies.name, schema: PendingSuppliesSchema },
+      { name: FlyingSquad.name, schema: FlyingSquadSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({
