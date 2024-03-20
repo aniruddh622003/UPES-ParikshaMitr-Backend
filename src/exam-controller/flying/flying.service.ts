@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFlyingDto } from './dto/create_flying.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  FlyingSqaudDocument,
+  FlyingSquadDocument,
   FlyingSquad,
 } from '../../schemas/flying-squad.schema';
 import { Model } from 'mongoose';
@@ -12,7 +12,7 @@ import { Slot, SlotDocument } from '../../schemas/slot.schema';
 export class FlyingService {
   constructor(
     @InjectModel(FlyingSquad.name)
-    private flyingSquadModel: Model<FlyingSqaudDocument>,
+    private flyingSquadModel: Model<FlyingSquadDocument>,
     @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
   ) {}
 
