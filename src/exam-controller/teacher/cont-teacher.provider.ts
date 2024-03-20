@@ -36,6 +36,8 @@ export class ContTeacherService {
       name: teacher.name,
       approved: teacher.approved,
       onboardedAt: (teacher as any).createdAt,
+      phone: teacher.phone,
+      email: teacher.email,
     }));
   }
 
@@ -48,6 +50,8 @@ export class ContTeacherService {
       sap_id: teacher.sap_id,
       name: teacher.name,
       onboardedAt: (teacher as any).createdAt,
+      phone: teacher.phone,
+      email: teacher.email,
     }));
   }
 
