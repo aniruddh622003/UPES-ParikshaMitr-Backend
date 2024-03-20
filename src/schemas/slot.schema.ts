@@ -55,6 +55,13 @@ export class Slot {
     default: [],
   })
   flying_squad: string[];
+
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Teacher',
+    default: [],
+  })
+  inv_duties: string[];
 }
 
 export const SlotSchema = SchemaFactory.createForClass(Slot);

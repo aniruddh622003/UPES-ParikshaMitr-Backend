@@ -29,6 +29,7 @@ import {
   ManualAssignDto,
   SetNumInvigilatorsDto,
 } from './dto/update-invigilation.dto';
+import { DutySheetUploadDto } from './dto/duty-sheet-upload.dto';
 
 @Controller('exam-controller/invigilation')
 export class InvigilationController {
@@ -169,5 +170,11 @@ export class InvigilationController {
   @Patch('/room/set-num-invigilators')
   setNumInvigilators(@Body() body: SetNumInvigilatorsDto) {
     return this.invigilationService.setNumInvigilators(body);
+  }
+
+  @UseGuards(ExamContGuard)
+  @Post('/slot/duty-sheet-upload')
+  dutySheetUpload(@Body() body: DutySheetUploadDto) {
+    return this.invigilationService.dutySheetUpload(body);
   }
 }
