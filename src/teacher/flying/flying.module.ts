@@ -7,11 +7,18 @@ import {
   FlyingSquad,
   FlyingSquadSchema,
 } from '../../schemas/flying-squad.schema';
+import { Room, RoomSchema } from '../../schemas/room.schema';
+import {
+  RoomInvigilator,
+  RoomInvigilatorSchema,
+} from '../../schemas/room-invigilator.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: FlyingSquad.name, schema: FlyingSquadSchema },
+      { name: Room.name, schema: RoomSchema },
+      { name: RoomInvigilator.name, schema: RoomInvigilatorSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

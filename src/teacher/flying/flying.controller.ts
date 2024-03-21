@@ -19,4 +19,16 @@ export class FlyingController {
   getFlyingSquad(@Query('room_id') room_id: string) {
     return this.flyingService.getFlyingSquad(room_id);
   }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('/inv')
+  getInvforRoom(@Query('room_id') room_id: string) {
+    return this.flyingService.getInvforRoom(room_id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Get('/rooms')
+  getRooms(@Req() req: any, @Query('slot_id') slot_id: string) {
+    return this.flyingService.getRooms(req?.user.id, slot_id);
+  }
 }
