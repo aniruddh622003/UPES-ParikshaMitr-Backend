@@ -22,6 +22,24 @@ export class FlyingSquad {
   slot: string;
 
   @Prop({
+    type: String,
+    default: 'not started',
+  })
+  status: string;
+
+  @Prop({
+    type: Date,
+    default: null,
+  })
+  in_time: Date;
+
+  @Prop({
+    type: Date,
+    default: null,
+  })
+  out_time: Date;
+
+  @Prop({
     type: [
       {
         room_id: {
@@ -30,14 +48,20 @@ export class FlyingSquad {
           required: true,
         },
         status: String,
+        room_remarks: {
+          type: String,
+          default: '',
+        },
       },
     ],
     required: true,
+    _id: false,
   })
   rooms_assigned: [
     {
       room_id: string;
       status: string;
+      room_remarks: string;
     },
   ];
 }

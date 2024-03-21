@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { FlyingService } from './flying.service';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
+import { RequestVisitDto } from './dto/request-visit.dto';
 
 @Controller('teacher/flying')
 export class FlyingController {
@@ -30,5 +31,11 @@ export class FlyingController {
   @Get('/rooms')
   getRooms(@Req() req: any, @Query('slot_id') slot_id: string) {
     return this.flyingService.getRooms(req?.user.id, slot_id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Post('/request-visit')
+  requestVisit(@Req() req: any, @Body() body: RequestVisitDto) {
+    return this.flyingService.requestVisit(req?.user.id, body);
   }
 }

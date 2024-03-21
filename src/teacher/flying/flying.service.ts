@@ -10,6 +10,7 @@ import {
   RoomInvigilator,
   RoomInvigilatorDocument,
 } from '../../schemas/room-invigilator.schema';
+import { RequestVisitDto } from './dto/request-visit.dto';
 
 @Injectable()
 export class FlyingService {
@@ -101,6 +102,34 @@ export class FlyingService {
     return {
       message: 'Rooms fetched successfully',
       rooms: rooms,
+    };
+  }
+
+  async requestVisit(teacher_id: string, body: RequestVisitDto) {
+    const flying_data = await this.flyingSquadModel.findOne({
+      teacher_id: teacher_id,
+      slot: body.slot_id,
+    });
+
+    if (!flying_data) {
+      throw new HttpException('Invalid Details', 400);
+    }
+
+    const room = flying_data.rooms_assigned.filter(
+      (room) => room.room_id == body.room_id,
+    )[0];
+
+    if (!room) {
+      throw new HttpException('Invalid Room ID', 400);
+    }
+
+    room.room_remarks = body.room_remarks;
+    room.status = 'requested';
+
+    await flying_data.save();
+
+    return {
+      message: 'Visit requested successfully',
     };
   }
 }

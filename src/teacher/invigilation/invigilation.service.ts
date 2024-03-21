@@ -60,6 +60,8 @@ export class InvigilationService {
       .populate('rooms_assigned.room_id', 'room_no');
 
     if (check_flying_squad) {
+      check_flying_squad.in_time = new Date();
+      check_flying_squad.status = 'ongoing';
       return {
         message: 'Flying Squad member assigned',
         data: {
