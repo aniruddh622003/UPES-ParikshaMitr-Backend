@@ -66,6 +66,7 @@ export class InvigilationService {
       return {
         message: 'Flying Squad member assigned',
         data: {
+          slot: curr_slot._id,
           room_data: check_flying_squad.rooms_assigned.map((room) => {
             return {
               room_id: (room.room_id as any)._id,
