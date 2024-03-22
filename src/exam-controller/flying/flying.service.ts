@@ -46,6 +46,8 @@ export class FlyingService {
   }
 
   async getBySlot(slot_id: string) {
-    return await this.flyingSquadModel.find({ slot: slot_id });
+    return await this.flyingSquadModel
+      .find({ slot: slot_id })
+      .populate('rooms_assigned.room_id', 'room_no');
   }
 }
