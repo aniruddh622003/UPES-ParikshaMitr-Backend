@@ -16,6 +16,7 @@ import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 import { IssueBSheetDto } from '../dto/issueBsheet.dto';
 import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
 import { SubmitControlletDto } from '../dto/submit.dto';
+import { ApproveFlyingDto } from '../dto/approve-flying.dto';
 
 @Controller('teacher/invigilation')
 export class InvigilationController {
@@ -111,5 +112,11 @@ export class InvigilationController {
   @Get('get-invigilators')
   getInvigilators(@Query('room_id') room_id: string) {
     return this.invigilationService.getInvigilators(room_id);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Post('approve-flying-visit')
+  approveFlyingVisit(@Body() body: ApproveFlyingDto, @Req() req) {
+    return this.invigilationService.approveFlyingVisit(body, req?.user.id);
   }
 }

@@ -569,6 +569,7 @@ export class InvigilationService {
     }
 
     const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: body.roomId,
       $or: [
         { invigilator1_id: body.invigilatorId },
         { invigilator2_id: body.invigilatorId },
