@@ -44,4 +44,8 @@ export class FlyingService {
       message: 'Rooms assigned successfully',
     };
   }
+
+  async getBySlot(slot_id: string) {
+    return await this.flyingSquadModel.find({ slot: slot_id });
+  }
 }
