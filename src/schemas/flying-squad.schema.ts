@@ -40,6 +40,12 @@ export class FlyingSquad {
   out_time: Date;
 
   @Prop({
+    type: String,
+    default: '',
+  })
+  final_remarks: string;
+
+  @Prop({
     type: [
       {
         room_id: {

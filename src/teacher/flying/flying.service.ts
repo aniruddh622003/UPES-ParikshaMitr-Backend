@@ -11,6 +11,7 @@ import {
   RoomInvigilatorDocument,
 } from '../../schemas/room-invigilator.schema';
 import { RequestVisitDto } from './dto/request-visit.dto';
+import { FinishDutyDto } from './dto/finish-duty.dto';
 
 @Injectable()
 export class FlyingService {
@@ -130,6 +131,40 @@ export class FlyingService {
 
     return {
       message: 'Visit requested successfully',
+    };
+  }
+
+  async finishDuty(teacher_id: string, body: FinishDutyDto) {
+    const flying_data = await this.flyingSquadModel
+      .findOne({
+        teacher_id: teacher_id,
+        slot: body.slot_id,
+      })
+      .populate('rooms_assigned.room_id');
+
+    if (!flying_data) {
+      throw new HttpException('Invalid Details', 400);
+    }
+
+    flying_data.rooms_assigned.forEach((room) => {
+      if (room.status !== 'approved') {
+        throw new HttpException(
+          'All rooms are not approved. Room No ' +
+            (room.room_id as any).room_no +
+            ' is not approved.',
+          400,
+        );
+      }
+    });
+
+    flying_data.out_time = new Date();
+    flying_data.final_remarks = body.final_remarks;
+    flying_data.status = 'completed';
+
+    await flying_data.save();
+
+    return {
+      message: 'Duty finished successfully',
     };
   }
 }

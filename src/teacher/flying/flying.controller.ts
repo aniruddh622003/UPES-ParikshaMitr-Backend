@@ -10,6 +10,7 @@ import {
 import { FlyingService } from './flying.service';
 import { TeacherJwtGuard } from '../../guards/teacher-jwt.guard';
 import { RequestVisitDto } from './dto/request-visit.dto';
+import { FinishDutyDto } from './dto/finish-duty.dto';
 
 @Controller('teacher/flying')
 export class FlyingController {
@@ -37,5 +38,11 @@ export class FlyingController {
   @Post('/request-visit')
   requestVisit(@Req() req: any, @Body() body: RequestVisitDto) {
     return this.flyingService.requestVisit(req?.user.id, body);
+  }
+
+  @UseGuards(TeacherJwtGuard)
+  @Post('/finish-duty')
+  finishDuty(@Req() req: any, @Body() body: FinishDutyDto) {
+    return this.flyingService.finishDuty(req?.user.id, body);
   }
 }

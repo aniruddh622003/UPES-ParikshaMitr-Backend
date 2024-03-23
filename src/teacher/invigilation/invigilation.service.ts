@@ -61,8 +61,16 @@ export class InvigilationService {
       .populate('rooms_assigned.room_id', 'room_no');
 
     if (check_flying_squad) {
-      check_flying_squad.in_time = new Date();
-      check_flying_squad.status = 'ongoing';
+      if (check_flying_squad.status === 'completed') {
+        throw new HttpException('Flying Squad visit already completed', 400);
+      }
+
+      if (check_flying_squad.status == 'not started') {
+        check_flying_squad.in_time = new Date();
+        check_flying_squad.status = 'ongoing';
+        await check_flying_squad.save();
+      }
+
       return {
         message: 'Flying Squad member assigned',
         data: {
