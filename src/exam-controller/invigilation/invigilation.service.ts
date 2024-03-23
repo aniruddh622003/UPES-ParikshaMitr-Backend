@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Room, RoomDocument } from '../../schemas/room.schema';
@@ -29,9 +29,14 @@ import {
 } from './dto/update-invigilation.dto';
 import { DutySheetUploadDto } from './dto/duty-sheet-upload.dto';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
+import {
+  FlyingSquad,
+  FlyingSquadDocument,
+} from '../../schemas/flying-squad.schema';
 
 @Injectable()
 export class InvigilationService {
+  private readonly logger = new Logger(InvigilationService.name);
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     @InjectModel(RoomInvigilator.name)
@@ -40,6 +45,8 @@ export class InvigilationService {
     @InjectModel(PendingSupplies.name)
     private pendingSuppliesModel: Model<PendingSuppliesDocument>,
     @InjectModel(Teacher.name) private teacherModel: Model<TeacherDocument>,
+    @InjectModel(FlyingSquad.name)
+    private flyingSquadModel: Model<FlyingSquadDocument>,
   ) {}
 
   async getSlots() {
@@ -717,6 +724,7 @@ export class InvigilationService {
     }
 
     const invigilator = await this.roomInvigilatorModel.findOne({
+      room_id: body.roomId,
       $or: [
         { invigilator1_id: body.invigilatorId },
         { invigilator2_id: body.invigilatorId },
@@ -827,16 +835,57 @@ export class InvigilationService {
       throw new HttpException('Slot not found', 404);
     }
 
+    if (body.inv_sap_ids.filter((id) => body.fly_sap_ids.includes(id)).length) {
+      throw new HttpException(
+        'Invigilator and Flying Squad cannot be the same',
+        400,
+      );
+    }
+
     slot.flying_squad = await Promise.all(
-      body.fly_sap_ids.map(async (sap_id) =>
-        (await this.teacherModel.findOne({ sap_id }))._id.toString(),
-      ),
+      body.fly_sap_ids.map(async (sap_id) => {
+        const t_id = await this.teacherModel.findOne({ sap_id });
+
+        if (!t_id) {
+          throw new HttpException(
+            `Teacher with SAP ID: ${sap_id} not found`,
+            404,
+          );
+        }
+
+        const check = await this.flyingSquadModel.findOne({
+          teacher_id: t_id._id,
+          slot: slot._id,
+        });
+        let flying;
+        if (check) {
+          flying = check;
+        } else {
+          flying = new this.flyingSquadModel({
+            teacher_id: t_id._id,
+            slot: slot._id,
+            rooms_assigned: [],
+          });
+        }
+
+        await flying.save();
+
+        return flying._id.toString();
+      }),
     );
 
     slot.inv_duties = await Promise.all(
-      body.inv_sap_ids.map(async (sap_id) =>
-        (await this.teacherModel.findOne({ sap_id }))._id.toString(),
-      ),
+      body.inv_sap_ids.map(async (sap_id) => {
+        const t_id = await this.teacherModel.findOne({ sap_id });
+        if (!t_id) {
+          throw new HttpException(
+            `Teacher with SAP ID: ${sap_id} not found`,
+            404,
+          );
+        }
+
+        return t_id._id.toString();
+      }),
     );
 
     await slot.save();

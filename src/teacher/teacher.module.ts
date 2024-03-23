@@ -10,6 +10,7 @@ import {
   Notification,
   NotificationSchema,
 } from '../schemas/notification.schema';
+import { FlyingModule } from './flying/flying.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {
       }),
     }),
     InvigilationModule,
+    FlyingModule,
   ],
   controllers: [TeacherController],
   providers: [TeacherService],

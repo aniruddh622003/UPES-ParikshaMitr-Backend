@@ -18,6 +18,11 @@ import {
 } from '../../schemas/pending-supplies.schema';
 import { UpdateSuppliesDto } from '../dto/update-supplies.dto';
 import { SubmitControlletDto } from '../dto/submit.dto';
+import {
+  FlyingSquad,
+  FlyingSquadDocument,
+} from '../../schemas/flying-squad.schema';
+import { ApproveFlyingDto } from '../dto/approve-flying.dto';
 
 @Injectable()
 export class InvigilationService {
@@ -28,6 +33,8 @@ export class InvigilationService {
     @InjectModel(Slot.name) private slotModel: Model<Slot>,
     @InjectModel(PendingSupplies.name)
     private pendingSuppliesModel: Model<PendingSuppliesDocument>,
+    @InjectModel(FlyingSquad.name)
+    private flyingSquadModel: Model<FlyingSquadDocument>,
   ) {}
 
   //TODO: Get Unique Code and Rooms from supertable
@@ -44,6 +51,39 @@ export class InvigilationService {
 
     if (!curr_slot) {
       throw new HttpException('Invalid unique code', 400);
+    }
+
+    const check_flying_squad = await this.flyingSquadModel
+      .findOne({
+        teacher_id: invigilator_id,
+        slot: curr_slot._id,
+      })
+      .populate('rooms_assigned.room_id', 'room_no');
+
+    if (check_flying_squad) {
+      if (check_flying_squad.status === 'completed') {
+        throw new HttpException('Flying Squad visit already completed', 400);
+      }
+
+      if (check_flying_squad.status == 'not started') {
+        check_flying_squad.in_time = new Date();
+        check_flying_squad.status = 'ongoing';
+        await check_flying_squad.save();
+      }
+
+      return {
+        message: 'Flying Squad member assigned',
+        data: {
+          slot: curr_slot._id,
+          room_data: check_flying_squad.rooms_assigned.map((room) => {
+            return {
+              room_id: (room.room_id as any)._id,
+              room_no: (room.room_id as any).room_no,
+              status: room.status,
+            };
+          }),
+        },
+      };
     }
 
     if (curr_slot.isDeletable) {
@@ -184,6 +224,9 @@ export class InvigilationService {
         {
           invigilator2_id: teacher_id,
         },
+        {
+          invigilator3_id: teacher_id,
+        },
       ],
     });
 
@@ -304,6 +347,9 @@ export class InvigilationService {
         {
           invigilator2_id: teacher_id,
         },
+        {
+          invigilator3_id: teacher_id,
+        },
       ],
     });
 
@@ -378,6 +424,9 @@ export class InvigilationService {
         },
         {
           invigilator2_id: teacher_id,
+        },
+        {
+          invigilator3_id: teacher_id,
         },
       ],
     });
@@ -712,6 +761,52 @@ export class InvigilationService {
         inv2: invigilators.invigilator2_id,
         inv3: invigilators.invigilator3_id,
       },
+    };
+  }
+
+  async approveFlyingVisit(body: ApproveFlyingDto, teacher_id: string) {
+    const flying_squad = await this.flyingSquadModel.findById(
+      body.flying_squad_id,
+    );
+    if (!flying_squad) {
+      throw new HttpException('Flying Squad not found', 404);
+    }
+
+    const checkInv = await this.roomInvigilatorModel.findOne({
+      room_id: body.room_id,
+      $or: [
+        {
+          invigilator1_id: teacher_id,
+        },
+        {
+          invigilator2_id: teacher_id,
+        },
+        {
+          invigilator3_id: teacher_id,
+        },
+      ],
+    });
+
+    if (!checkInv) {
+      throw new HttpException('Invigilator not assigned to this room', 403);
+    }
+    const room = flying_squad.rooms_assigned.filter(
+      (room) => room.room_id == body.room_id,
+    )[0];
+
+    if (!room) {
+      throw new HttpException('Room not found', 404);
+    }
+    if (room.status === 'approved') {
+      throw new HttpException('Already approved', 400);
+    }
+
+    room.status = 'approved';
+
+    await flying_squad.save();
+
+    return {
+      message: 'Flying Visit Approved',
     };
   }
 }

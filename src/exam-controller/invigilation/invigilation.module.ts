@@ -16,6 +16,10 @@ import {
 import { ExamController } from '../entities/exam-controller.entity';
 import { ExamControllerSchema } from '../../schemas/exam-controller.schema';
 import { Teacher, TeacherSchema } from '../../schemas/teacher.schema';
+import {
+  FlyingSquad,
+  FlyingSquadSchema,
+} from '../../schemas/flying-squad.schema';
 
 @Module({
   imports: [
@@ -25,10 +29,8 @@ import { Teacher, TeacherSchema } from '../../schemas/teacher.schema';
       { name: Slot.name, schema: SlotSchema },
       { name: PendingSupplies.name, schema: PendingSuppliesSchema },
       { name: ExamController.name, schema: ExamControllerSchema },
-      {
-        name: Teacher.name,
-        schema: TeacherSchema,
-      },
+      { name: Teacher.name, schema: TeacherSchema },
+      { name: FlyingSquad.name, schema: FlyingSquadSchema },
     ]),
     JwtModule.registerAsync({
       useFactory: () => ({

@@ -2,17 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { CreateFlyingDto } from './dto/create_flying.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  FlyingSqaudDocument,
+  FlyingSquadDocument,
   FlyingSquad,
 } from '../../schemas/flying-squad.schema';
 import { Model } from 'mongoose';
 import { Slot, SlotDocument } from '../../schemas/slot.schema';
+import { AssignRoomsDto } from './dto/assign-rooms.dto';
 
 @Injectable()
 export class FlyingService {
   constructor(
     @InjectModel(FlyingSquad.name)
-    private flyingSquadModel: Model<FlyingSqaudDocument>,
+    private flyingSquadModel: Model<FlyingSquadDocument>,
     @InjectModel(Slot.name) private slotModel: Model<SlotDocument>,
   ) {}
 
@@ -28,5 +29,26 @@ export class FlyingService {
     return {
       message: 'Flying squad member added successfully',
     };
+  }
+
+  async assignRooms(body: AssignRoomsDto) {
+    const flyingSquad = await this.flyingSquadModel.findById(
+      body.flying_squad_id,
+    );
+    flyingSquad.rooms_assigned = body.room_ids.map((room) => ({
+      room_id: room,
+      status: 'assigned',
+    })) as any;
+    await flyingSquad.save();
+    return {
+      message: 'Rooms assigned successfully',
+    };
+  }
+
+  async getBySlot(slot_id: string) {
+    return await this.flyingSquadModel
+      .find({ slot: slot_id })
+      .populate('rooms_assigned.room_id', 'room_no')
+      .populate('teacher_id', 'name sap_id email phone');
   }
 }
