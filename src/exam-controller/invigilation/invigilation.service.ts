@@ -560,6 +560,18 @@ export class InvigilationService {
       );
     }
 
+    const check_flying = await this.flyingSquadModel.findOne({
+      teacher_id: body.invigilatorId,
+      slot: body.slotId,
+    });
+
+    if (check_flying) {
+      throw new HttpException(
+        'Invigilator already assigned as Flying Squad',
+        400,
+      );
+    }
+
     const roomInv = await this.roomInvigilatorModel.findOne({
       room_id: body.roomId,
     });
@@ -569,7 +581,7 @@ export class InvigilationService {
     }
 
     const invigilator = await this.roomInvigilatorModel.findOne({
-      room_id: body.roomId,
+      room_id: { $in: slot.rooms },
       $or: [
         { invigilator1_id: body.invigilatorId },
         { invigilator2_id: body.invigilatorId },
@@ -612,6 +624,11 @@ export class InvigilationService {
       await roomInv.save();
     } else {
       throw new HttpException('Room already has 3 invigilators', 400);
+    }
+
+    if (!slot.inv_duties.includes(body.invigilatorId)) {
+      slot.updateOne({ $addToSet: { inv_duties: body.invigilatorId } });
+      await slot.save();
     }
 
     return {
