@@ -177,4 +177,10 @@ export class InvigilationController {
   dutySheetUpload(@Body() body: DutySheetUploadDto) {
     return this.invigilationService.dutySheetUpload(body);
   }
+
+  @UseGuards(ExamContGuard)
+  @Get('/rooms')
+  getRoomsForSlot(@Query('slot_id') slot_id: string) {
+    return this.invigilationService.getRoomsForSlot(slot_id);
+  }
 }

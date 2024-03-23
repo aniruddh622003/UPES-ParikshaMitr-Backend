@@ -731,4 +731,18 @@ export class InvigilationService {
       message: 'Duty Sheet uploaded',
     };
   }
+
+  async getRoomsForSlot(slot_id: string) {
+    const slot = await this.slotModel.findById(slot_id);
+    if (!slot) {
+      throw new HttpException('Slot not found', 404);
+    }
+
+    const rooms = await this.roomModel.find({ _id: { $in: slot.rooms } });
+
+    return {
+      message: 'Rooms fetched successfully',
+      data: rooms,
+    };
+  }
 }

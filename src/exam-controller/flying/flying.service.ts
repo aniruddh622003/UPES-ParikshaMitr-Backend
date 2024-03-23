@@ -35,10 +35,26 @@ export class FlyingService {
     const flyingSquad = await this.flyingSquadModel.findById(
       body.flying_squad_id,
     );
-    flyingSquad.rooms_assigned = body.room_ids.map((room) => ({
-      room_id: room,
-      status: 'assigned',
-    })) as any;
+    if (!flyingSquad) {
+      return {
+        message: 'Flying squad member not found',
+      };
+    }
+    if ((flyingSquad.rooms_assigned.length as any) == 0) {
+      flyingSquad.rooms_assigned = body.room_ids.map((room) => ({
+        room_id: room,
+        status: 'assigned',
+      })) as any;
+    } else {
+      (flyingSquad.rooms_assigned as any) = [
+        ...flyingSquad.rooms_assigned,
+        ...(body.room_ids.map((room) => ({
+          room_id: room,
+          status: 'assigned',
+        })) as any),
+      ];
+    }
+
     await flyingSquad.save();
     return {
       message: 'Rooms assigned successfully',
