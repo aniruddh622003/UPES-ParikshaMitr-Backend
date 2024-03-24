@@ -33,6 +33,7 @@ export class TeacherService {
   ) {}
 
   async create(createTeacherDto: CreateTeacherDto) {
+    try{
     const teacher = await this.teacherModel.findOne({
       sap_id: createTeacherDto.sap_id,
     });
@@ -58,10 +59,17 @@ export class TeacherService {
         name: createdTeacher.name,
         approved: createdTeacher.approved,
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async login(teacher: TeacherLoginDto) {
+    try{
     const teacherData = await this.teacherModel.findOne({
       sap_id: teacher.sap_id,
     });
@@ -114,17 +122,30 @@ export class TeacherService {
         },
         404,
       );
+    }}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
     }
   }
 
   async findAll() {
+    try{
     const teachers = await this.teacherModel.find().exec();
     const result = teachers.map((teacher) => {
       const x = teacher.toObject();
       delete x.password;
       return x;
     });
-    return result;
+    return result;}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async findOne(id: string) {
@@ -151,6 +172,7 @@ export class TeacherService {
   }
 
   async update(id: number, updateTeacherDto: UpdateTeacherDto) {
+    try{
     const update = await this.teacherModel.findByIdAndUpdate(
       id,
       {
@@ -178,6 +200,13 @@ export class TeacherService {
         email: update.email,
       },
     };
+  }catch (err) {
+    if (err instanceof HttpException) {
+      throw err;
+    } else {
+      throw new HttpException(err.message, 400);
+    }
+  }
   }
 
   remove(id: number) {
@@ -185,6 +214,7 @@ export class TeacherService {
   }
 
   async getSchedule(user: any) {
+    try{
     const schedule = await this.scheduleModel.find({
       participants: user.id,
     });
@@ -217,10 +247,17 @@ export class TeacherService {
     }
     return {
       returnSchedule,
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getNotifications() {
+    try{
     const notifications = await this.notificationModel
       .find()
       .populate('sender', 'name')
@@ -241,6 +278,12 @@ export class TeacherService {
           }),
         ],
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 }

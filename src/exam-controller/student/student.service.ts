@@ -12,6 +12,7 @@ export class StudentService {
   ) {}
 
   async searchStudent(sap_id: string, roll_no: string) {
+    try{
     if (!sap_id && !roll_no) {
       throw new HttpException('SAP ID or Roll No is required', 400);
     }
@@ -138,6 +139,12 @@ export class StudentService {
           new Date(a.slot.date) < new Date(b.slot.date) ? 1 : -1,
         ),
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 }

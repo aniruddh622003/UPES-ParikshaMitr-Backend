@@ -25,7 +25,7 @@ export class CreateTeacherDto {
     minLowercase: 0,
     minNumbers: 0,
     minSymbols: 0,
-    minUppercase: 0,
+    minUppercase: 0,  
   })
   password: string;
 }

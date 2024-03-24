@@ -18,6 +18,7 @@ export class UfmService {
   ) {}
 
   async markUfm(body: MarkUFMDto, teacher: any) {
+    try{
     const room = await this.roomModel
       .findById(body.room_id)
       .populate('room_invigilator_id', 'invigilator1_id invigilator2_id');
@@ -104,9 +105,17 @@ export class UfmService {
     }
 
     return ufm;
+  }catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getAllUFMs() {
+    try{
     const slots = await this.slotModel
       .find({
         ufms: { $exists: true, $not: { $size: 0 } },
@@ -163,10 +172,17 @@ export class UfmService {
       res.push(r);
     }
 
-    return res;
+    return res;}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getUFMBySlot(slot_id) {
+    try{
     const slot = await this.slotModel.findById(slot_id).populate({
       path: 'ufms',
     });
@@ -219,10 +235,17 @@ export class UfmService {
       };
     }
 
-    return r;
+    return r;}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getUFMById(id) {
+    try{
     const ufm = await this.ufmModel.findById(id);
     if (!ufm) {
       throw new HttpException('UFM not found', 404);
@@ -265,6 +288,12 @@ export class UfmService {
       seat_no: room.students[0].seat_no,
     };
 
-    return r;
+    return r;}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 }

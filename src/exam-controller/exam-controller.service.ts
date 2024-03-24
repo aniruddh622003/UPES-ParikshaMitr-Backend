@@ -27,6 +27,7 @@ export class ExamControllerService {
   ) {}
 
   async create(createExamControllerDto: CreateExamControllerDto) {
+    try{
     const examControllerData = await this.examControllerModel.findOne({
       username: createExamControllerDto.username,
     });
@@ -51,10 +52,17 @@ export class ExamControllerService {
       data: {
         name: createdController.name,
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async login(examController: LoginExamControllerDto) {
+    try{
     const examControllerData = await this.examControllerModel.findOne({
       username: examController.username,
     });
@@ -89,10 +97,17 @@ export class ExamControllerService {
         },
         404,
       );
+    }}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
     }
   }
 
   async getNotifications() {
+    try{
     const notifications = await this.notificationModel
       .find()
       .populate('sender', 'name');
@@ -101,13 +116,20 @@ export class ExamControllerService {
       data: {
         notifications,
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async createNotification(
     notificationData: CreateNotificationDto,
     userId: string,
   ) {
+    try{
     const createdNotification = new this.notificationModel({
       ...notificationData,
       sender: userId,
@@ -118,7 +140,13 @@ export class ExamControllerService {
       data: {
         createdNotification,
       },
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   findAll() {

@@ -24,6 +24,7 @@ export class FlyingService {
   ) {}
 
   async getFlyingSquad(room_id: string) {
+    try{
     const flying_data = await this.flyingSquadModel
       .find({
         'rooms_assigned.room_id': room_id,
@@ -55,10 +56,17 @@ export class FlyingService {
     return {
       message: 'Flying squad member assigned to this room',
       flying_squad: res,
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getInvforRoom(room_id: string) {
+    try{
     const invigilators = await this.roomInvigilatorModel
       .findOne({
         room_id: room_id,
@@ -77,10 +85,17 @@ export class FlyingService {
     return {
       message: 'Flying squad member assigned to this room',
       invigilators: res,
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async getRooms(teacher_id, slot_id) {
+    try{
     const flying_data = await this.flyingSquadModel
       .findOne({
         teacher_id: teacher_id,
@@ -103,10 +118,17 @@ export class FlyingService {
     return {
       message: 'Rooms fetched successfully',
       rooms: rooms,
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async requestVisit(teacher_id: string, body: RequestVisitDto) {
+    try{
     const flying_data = await this.flyingSquadModel.findOne({
       teacher_id: teacher_id,
       slot: body.slot_id,
@@ -131,10 +153,17 @@ export class FlyingService {
 
     return {
       message: 'Visit requested successfully',
-    };
+    };}catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        throw new HttpException(err.message, 400);
+      }
+    }
   }
 
   async finishDuty(teacher_id: string, body: FinishDutyDto) {
+    try{
     const flying_data = await this.flyingSquadModel
       .findOne({
         teacher_id: teacher_id,
@@ -166,5 +195,12 @@ export class FlyingService {
     return {
       message: 'Duty finished successfully',
     };
+  }catch (err) {
+    if (err instanceof HttpException) {
+      throw err;
+    } else {
+      throw new HttpException(err.message, 400);
+    }
+  }
   }
 }
